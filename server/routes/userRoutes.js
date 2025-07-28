@@ -7,12 +7,12 @@ const router = express.Router();
 import {
   authUser,
   registerUser,
+  updateUserProfile,
   getUserCart,
   addToUserCart,
   updateCartItemQuantity,
   removeFromUserCart,
   checkUserCanReview,
-   updateUserProfile,
   getUsers,
   deleteUser,
   getUserById,
@@ -23,16 +23,15 @@ import {
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 // --- Public & Admin Routes for '/' ---
-// We chain the POST (public) and GET (admin) methods for the root path.
 router.route('/')
-  .post(registerUser)            // Anyone can register
-  .get(protect, admin, getUsers); // Only admins can get all users
+  .post(registerUser)
+  .get(protect, admin, getUsers);
 
 // --- Public Route for '/login' ---
 router.post('/login', authUser);
 
-router.route('/profile')
-  .put(protect, updateUserProfile);
+// --- Protected User Profile Route ---
+router.route('/profile').put(protect, updateUserProfile);
 
 // --- Protected User Cart Routes ---
 router.route('/cart')
@@ -45,13 +44,10 @@ router.delete('/cart/:productId', protect, removeFromUserCart);
 // --- Protected User Review Eligibility Route ---
 router.get('/can-review/:productId', protect, checkUserCanReview);
 
-
 // --- Protected Admin Routes for '/:id' ---
-// All routes related to a specific user ID are chained here.
 router.route('/:id')
   .delete(protect, admin, deleteUser)
   .get(protect, admin, getUserById)
   .put(protect, admin, updateUser);
-  
 
 export default router;
