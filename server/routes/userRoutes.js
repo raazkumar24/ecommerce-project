@@ -1,53 +1,30 @@
-// FILE: server/routes/userRoutes.js (Cleaned and Organized)
+// FILE: server/routes/userRoutes.js (Final Corrected Version)
 
 import express from 'express';
 const router = express.Router();
-
-// --- Controllers ---
 import {
-  authUser,
-  registerUser,
-  updateUserProfile,
-  getUserCart,
-  addToUserCart,
-  updateCartItemQuantity,
-  removeFromUserCart,
-  checkUserCanReview,
-  getUsers,
-  deleteUser,
-  getUserById,
-  updateUser
+  authUser, registerUser, updateUserProfile,
+  getUserCart, addToUserCart, updateCartItemQuantity, removeFromUserCart,
+  checkUserCanReview, getUsers, deleteUser, getUserById, updateUser
 } from '../controllers/userController.js';
-
-// --- Middleware ---
 import { protect, admin } from '../middleware/authMiddleware.js';
 
-// --- Public & Admin Routes for '/' ---
-router.route('/')
-  .post(registerUser)
-  .get(protect, admin, getUsers);
-
-// --- Public Route for '/login' ---
+// Public routes
 router.post('/login', authUser);
+router.post('/', registerUser);
 
-// --- Protected User Profile Route ---
-router.route('/profile').put(protect, updateUserProfile);
-
-// --- Protected User Cart Routes ---
-router.route('/cart')
-  .get(protect, getUserCart)
-  .post(protect, addToUserCart)
-  .put(protect, updateCartItemQuantity);
-
+// Protected user routes
+router.put('/profile', protect, updateUserProfile);
+router.get('/cart', protect, getUserCart);
+router.post('/cart', protect, addToUserCart);
+router.put('/cart', protect, updateCartItemQuantity);
 router.delete('/cart/:productId', protect, removeFromUserCart);
-
-// --- Protected User Review Eligibility Route ---
 router.get('/can-review/:productId', protect, checkUserCanReview);
 
-// --- Protected Admin Routes for '/:id' ---
-router.route('/:id')
-  .delete(protect, admin, deleteUser)
-  .get(protect, admin, getUserById)
-  .put(protect, admin, updateUser);
+// Admin routes
+router.get('/', protect, admin, getUsers);
+router.delete('/:id', protect, admin, deleteUser);
+router.get('/:id', protect, admin, getUserById);
+router.put('/:id', protect, admin, updateUser);
 
 export default router;
