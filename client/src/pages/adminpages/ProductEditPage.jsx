@@ -290,7 +290,7 @@ const ProductEditPage = ({ id, navigate }) => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`api/products/${id}`);
+        const res = await fetch(`/api/products/${id}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to fetch product");
 
@@ -324,7 +324,7 @@ const ProductEditPage = ({ id, navigate }) => {
     setLoadingUpdate(true);
     setErrorUpdate(null);
     try {
-      const res = await fetch(`api/products/${id}`, {
+      const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -360,7 +360,7 @@ const ProductEditPage = ({ id, navigate }) => {
     setUploading(true);
 
     try {
-      const res = await fetch("api/upload", {
+      const res = await fetch("/api/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${userInfo.token}`,

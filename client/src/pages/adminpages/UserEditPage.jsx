@@ -19,7 +19,7 @@ const UserEditPage = ({ id, navigate }) => {
     const fetchUserDetails = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`api/users/${id}`, {
+        const res = await fetch(`/api/users/${id}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
         const data = await res.json();
@@ -44,7 +44,7 @@ const UserEditPage = ({ id, navigate }) => {
     e.preventDefault();
     setLoadingUpdate(true);
     try {
-      const res = await fetch(`api/users/${id}`, {
+      const res = await fetch(`/api/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

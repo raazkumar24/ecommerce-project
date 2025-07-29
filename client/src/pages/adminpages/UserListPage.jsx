@@ -14,7 +14,7 @@ const UserListPage = ({ navigate }) => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch('api/users', {
+      const res = await fetch('/api/users', {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },
@@ -40,7 +40,7 @@ const UserListPage = ({ navigate }) => {
   const deleteHandler = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        const res = await fetch(`api/users/${id}`, {
+        const res = await fetch(`/api/users/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
