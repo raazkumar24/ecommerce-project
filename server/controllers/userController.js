@@ -92,7 +92,9 @@ const updateUserProfile = async (req, res) => {
 // @route   GET /api/users/cart
 // @access  Private
 const getUserCart = async (req, res) => {
-  const user = await User.findById(req.user._id).populate('cart.product', 'name price image');
+  // --- THIS IS THE FIX ---
+  // The populate method now fetches the `images` array in addition to the other fields.
+  const user = await User.findById(req.user._id).populate('cart.product', 'name price image images');
   if (user) {
     res.json(user.cart);
   } else {
@@ -115,7 +117,8 @@ const addToUserCart = async (req, res) => {
       user.cart.push({ product: productId, qty });
     }
     await user.save();
-    const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image');
+    // --- THIS IS THE FIX ---
+    const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image images');
     res.status(201).json(updatedUser.cart);
   } else {
     res.status(404).json({ message: 'User not found' });
@@ -138,7 +141,8 @@ const updateCartItemQuantity = async (req, res) => {
         user.cart = user.cart.filter(cartItem => cartItem.product.toString() !== productId);
       }
       await user.save();
-      const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image');
+      // --- THIS IS THE FIX ---
+      const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image images');
       res.json(updatedUser.cart);
     } else {
       res.status(404).json({ message: 'Item not found in cart' });
@@ -158,7 +162,8 @@ const removeFromUserCart = async (req, res) => {
   if (user) {
     user.cart = user.cart.filter(item => item.product.toString() !== productId);
     await user.save();
-    const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image');
+    // --- THIS IS THE FIX ---
+    const updatedUser = await User.findById(req.user._id).populate('cart.product', 'name price image images');
     res.json(updatedUser.cart);
   } else {
     res.status(404).json({ message: 'User not found' });

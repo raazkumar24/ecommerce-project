@@ -1,7 +1,7 @@
-// FILE: server/controllers/orderController.js (Corrected with Clear Cart Logic)
+// FILE: server/controllers/orderController.js (Final Corrected Version)
 
 import Order from '../models/orderModel.js';
-import User from '../models/userModel.js'; // 1. Import the User model to modify the user's cart
+import User from '../models/userModel.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -21,9 +21,21 @@ const addOrderItems = async (req, res) => {
     res.status(400).json({ message: 'No order items' });
     return;
   } else {
+    // --- THIS IS THE FIX ---
+    // Instead of spreading the entire cart item, we now create a new object for each
+    // order item, carefully selecting only the fields that our Order model expects.
+    // This prevents validation errors and ensures data consistency.
     const order = new Order({
-      orderItems: orderItems.map((x) => ({ ...x, product: x._id })),
-      user: req.user._id, // Retrieved from the protected route middleware
+      orderItems: orderItems.map((x) => ({
+        name: x.name,
+        qty: x.qty,
+        // We also add robust logic to get the primary image, whether it's from
+        // the new `images` array or the old `image` field.
+        image: (x.images && x.images[0]) || x.image,
+        price: x.price,
+        product: x._id, // This links back to the original Product document
+      })),
+      user: req.user._id,
       shippingAddress,
       paymentMethod,
       itemsPrice,
@@ -32,21 +44,15 @@ const addOrderItems = async (req, res) => {
       totalPrice,
     });
 
-    // Save the newly created order to the database
     const createdOrder = await order.save();
     
-    // --- THIS IS THE FIX ---
-    // 2. After the order is successfully created, find the user...
+    // After the order is successfully created, find the user and clear their cart.
     const user = await User.findById(req.user._id);
     if (user) {
-        // ...and set their cart array to be empty.
-        user.cart = [];
-        // 3. Save this change back to the database.
-        await user.save();
+        user.cart = []; // Set the cart array to be empty
+        await user.save(); // Save the change to the database
     }
-    // ----------------------
 
-    // Respond with the created order details
     res.status(201).json(createdOrder);
   }
 };
@@ -55,9 +61,7 @@ const addOrderItems = async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private
 const getOrderById = async (req, res) => {
-  // Populate user name and email with the order
   const order = await Order.findById(req.params.id).populate('user', 'name email');
-
   if (order) {
     res.json(order);
   } else {
@@ -77,7 +81,6 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  // Find all orders and populate user's id and name
   const orders = await Order.find({}).populate('user', 'id name');
   res.json(orders);
 };
@@ -87,11 +90,9 @@ const getOrders = async (req, res) => {
 // @access  Private/Admin
 const updateOrderToDelivered = async (req, res) => {
   const order = await Order.findById(req.params.id);
-
   if (order) {
     order.isDelivered = true;
     order.deliveredAt = Date.now();
-
     const updatedOrder = await order.save();
     res.json(updatedOrder);
   } else {

@@ -1,103 +1,26 @@
-// // FILE: client/src/pages/RegisterPage.jsx
-
-// import React, { useState, useEffect } from 'react';
-// import { useAuth } from '../context/AuthContext';
-
-// const RegisterPage = ({ navigate }) => {
-//   const [name, setName] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [confirmPassword, setConfirmPassword] = useState('');
-//   const [error, setError] = useState('');
-//   const [loading, setLoading] = useState(false);
-
-//   const { register, userInfo } = useAuth();
-
-//   useEffect(() => {
-//     if (userInfo) {
-//       navigate('/');
-//     }
-//   }, [userInfo, navigate]);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (password !== confirmPassword) {
-//       setError('Passwords do not match');
-//       return;
-//     }
-//     setError('');
-//     setLoading(true);
-//     try {
-//       await register(name, email, password);
-//       navigate('/');
-//     } catch (err) {
-//       setError(err.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="flex justify-center items-center">
-//       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-//         <h1 className="text-2xl font-bold text-center">Sign Up</h1>
-//         {error && <div className="p-3 bg-red-100 text-red-700 rounded">{error}</div>}
-//         <form onSubmit={handleSubmit} className="space-y-6">
-//           <div>
-//             <label className="block text-sm font-medium">Name</label>
-//             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-3 py-2 mt-1 border rounded-md" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium">Email Address</label>
-//             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-3 py-2 mt-1 border rounded-md" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium">Password</label>
-//             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-3 py-2 mt-1 border rounded-md" />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium">Confirm Password</label>
-//             <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full px-3 py-2 mt-1 border rounded-md" />
-//           </div>
-//           <button type="submit" disabled={loading} className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
-//             {loading ? 'Registering...' : 'Register'}
-//           </button>
-//         </form>
-//         <div className="text-center">
-//           Have an Account?{' '}
-//           <a href="/login" onClick={(e) => { e.preventDefault(); navigate('/login'); }} className="text-blue-600 hover:underline">
-//             Login
-//           </a>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default RegisterPage;
-
-
-
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { EyeIcon, EyeSlashIcon, EnvelopeIcon, UserIcon, LockClosedIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
+import { FiUser, FiMail, FiLock, FiUserPlus } from 'react-icons/fi';
 
 const RegisterPage = ({ navigate }) => {
+  // --- STATE MANAGEMENT ---
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // --- CONTEXT HOOKS ---
   const { register, userInfo } = useAuth();
 
+  // --- SIDE EFFECTS ---
   useEffect(() => {
     if (userInfo) navigate('/');
   }, [userInfo, navigate]);
 
+  // --- HANDLERS ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -116,117 +39,98 @@ const RegisterPage = ({ navigate }) => {
     }
   };
 
+  // --- ANIMATION VARIANTS ---
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } },
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-indigo-50 to-white">
-      <div className="flex w-full max-w-3xl shadow-2xl rounded-2xl bg-white/80 backdrop-blur-lg">
-        {/* Illustration */}
-        <div className="hidden md:flex flex-col justify-center items-center w-1/2 px-10 py-16 bg-gradient-to-br from-white via-pink-100 to-indigo-100 rounded-l-2xl border-r border-gray-100">
-          <ShoppingCartIcon className="w-20 h-20 text-pink-300 mb-6" />
-          <h2 className="text-3xl font-extrabold text-pink-600">Create Account</h2>
-          <p className="mt-4 text-lg text-pink-400 text-center max-w-xs">
-            Join and unlock exclusive offers made for you!
-          </p>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="flex w-full max-w-4xl shadow-2xl rounded-2xl bg-white/80 backdrop-blur-lg overflow-hidden"
+      >
+        {/* Left Column: Illustration & Welcome Message */}
+        <div className="hidden md:flex flex-col justify-center items-center w-1/2 p-10 bg-gradient-to-br from-[#FFF5F0] to-[#FADCD9] border-r border-gray-100">
+          <motion.div variants={itemVariants}>
+            <svg className="w-24 h-24 text-[#D98A7E]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7V21H22V7L12 2Z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/><path d="M12 14C10.3431 14 9 12.6569 9 11C9 9.34315 10.3431 8 12 8C13.6569 8 15 9.34315 15 11C15 12.6569 13.6569 14 12 14Z" stroke="currentColor" strokeWidth="1"/></svg>
+          </motion.div>
+          <motion.h2 variants={itemVariants} className="mt-6 text-3xl font-bold text-[#5C3A2E]">Create an Account</motion.h2>
+          <motion.p variants={itemVariants} className="mt-2 text-gray-500 text-center">
+            Join us and unlock exclusive offers!
+          </motion.p>
         </div>
-        {/* Register Form */}
+        
+        {/* Right Column: Register Form */}
         <div className="flex-1 flex flex-col justify-center p-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sign Up & Shop</h2>
+          <motion.h2 variants={itemVariants} className="text-3xl font-serif font-bold text-[#D98A7E] mb-6 text-center">Sign Up</motion.h2>
           {error && (
-            <div className="mb-4 text-center text-red-600 bg-red-100 px-3 py-2 rounded text-sm shadow">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 text-center text-red-600 bg-red-100 px-3 py-2 rounded text-sm shadow">
               {error}
-            </div>
+            </motion.div>
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
-              <UserIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-pink-300" />
+            <motion.div variants={itemVariants} className="relative">
+              <FiUser className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                type="text"
-                required
-                placeholder="Full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={loading}
-                autoComplete="name"
-                className="w-full py-3 pl-10 pr-3 rounded-lg border border-gray-200 bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-300 shadow transition"
+                type="text" required placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)}
+                disabled={loading} autoComplete="name"
+                className="w-full py-3 pl-12 pr-4 rounded-lg border border-gray-200 bg-white focus:border-[#D4A28E] focus:ring-2 focus:ring-[#FADCD9] shadow-sm transition"
               />
-            </div>
-            <div className="relative">
-              <EnvelopeIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-pink-300" />
+            </motion.div>
+            <motion.div variants={itemVariants} className="relative">
+              <FiMail className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                type="email"
-                required
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                autoComplete="email"
-                className="w-full py-3 pl-10 pr-3 rounded-lg border border-gray-200 bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-300 shadow transition"
+                type="email" required placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)}
+                disabled={loading} autoComplete="email"
+                className="w-full py-3 pl-12 pr-4 rounded-lg border border-gray-200 bg-white focus:border-[#D4A28E] focus:ring-2 focus:ring-[#FADCD9] shadow-sm transition"
               />
-            </div>
-            <div className="relative">
-              <LockClosedIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-pink-300" />
+            </motion.div>
+            <motion.div variants={itemVariants} className="relative">
+              <FiLock className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                autoComplete="new-password"
-                className="w-full py-3 pl-10 pr-10 rounded-lg border border-gray-200 bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-300 shadow transition"
+                type="password" required placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+                disabled={loading} autoComplete="new-password"
+                className="w-full py-3 pl-12 pr-4 rounded-lg border border-gray-200 bg-white focus:border-[#D4A28E] focus:ring-2 focus:ring-[#FADCD9] shadow-sm transition"
               />
-              <button
-                type="button"
-                aria-label="Toggle password visibility"
-                tabIndex={-1}
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-600 transition"
-              >
-                {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-              </button>
-            </div>
-            <div className="relative">
-              <LockClosedIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-pink-300" />
+            </motion.div>
+            <motion.div variants={itemVariants} className="relative">
+              <FiLock className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                required
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={loading}
-                autoComplete="new-password"
-                className="w-full py-3 pl-10 pr-10 rounded-lg border border-gray-200 bg-white focus:border-pink-400 focus:ring-2 focus:ring-pink-300 shadow transition"
+                type="password" required placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading} autoComplete="new-password"
+                className="w-full py-3 pl-12 pr-4 rounded-lg border border-gray-200 bg-white focus:border-[#D4A28E] focus:ring-2 focus:ring-[#FADCD9] shadow-sm transition"
               />
-              <button
-                type="button"
-                aria-label="Toggle confirm password visibility"
-                tabIndex={-1}
-                onClick={() => setShowConfirmPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-pink-600 transition"
-              >
-                {showConfirmPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
-              </button>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-pink-400 text-white font-bold rounded-lg shadow-lg hover:bg-pink-500 transition duration-200 disabled:opacity-60"
+            </motion.div>
+            <motion.button
+              type="submit" disabled={loading}
+              className="w-full py-3 bg-[#D4A28E] text-white font-bold rounded-lg shadow-lg hover:bg-[#C8907A] transition duration-200 disabled:opacity-60 flex items-center justify-center gap-2"
+              whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
             >
-              {loading ? 'Registering...' : 'Register'}
-            </button>
+              <FiUserPlus />
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </motion.button>
           </form>
-          <div className="text-center mt-6 text-gray-700 text-sm">
+          <motion.div variants={itemVariants} className="text-center mt-6 text-gray-700 text-sm">
             Already have an account?{' '}
             <button
-              type="button"
-              onClick={() => navigate('/login')}
-              className="font-semibold text-pink-600 hover:underline"
+              type="button" onClick={() => navigate('/login')}
+              className="font-semibold text-[#D98A7E] hover:underline"
               disabled={loading}
             >
-              Log in
+              Sign In
             </button>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

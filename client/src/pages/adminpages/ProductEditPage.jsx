@@ -1,291 +1,36 @@
-// // FILE: client/src/pages/ProductEditPage.jsx
-
-// import React, { useState, useEffect } from "react";
-// import { useAuth } from "../../context/AuthContext";
-// import { useNotification } from "../../context/NotificationContext";
-
-// /**
-//  * ProductEditPage - Admin interface to edit an existing product.
-//  *
-//  * Props:
-//  * - id: Product ID to edit (string).
-//  * - navigate: Navigation function to redirect after update.
-//  */
-// const ProductEditPage = ({ id, navigate }) => {
-//   const { userInfo } = useAuth();
-//   const { showNotification } = useNotification();
-
-//   // --- Form fields states ---
-//   const [name, setName] = useState("");
-//   const [price, setPrice] = useState(0);
-//   const [image, setImage] = useState("");
-//   const [brand, setBrand] = useState("");
-//   const [category, setCategory] = useState("");
-//   const [countInStock, setCountInStock] = useState(0);
-//   const [description, setDescription] = useState("");
-
-//   // --- UI states ---
-//   const [loading, setLoading] = useState(true);           // Loading product details
-//   const [error, setError] = useState(null);               // Error fetching details
-//   const [loadingUpdate, setLoadingUpdate] = useState(false);  // Loading during update
-//   const [errorUpdate, setErrorUpdate] = useState(null);       // Error during update
-
-//   // Fetch product details when component mounts or id changes
-//   useEffect(() => {
-//     const fetchProductDetails = async () => {
-//       try {
-//         setLoading(true);
-//         const res = await fetch(`http://localhost:5000/api/products/${id}`);
-//         const data = await res.json();
-
-//         if (!res.ok) throw new Error(data.message || "Failed to fetch product");
-
-//         // Pre-fill the form fields
-//         setName(data.name);
-//         setPrice(data.price);
-//         setImage(data.image);
-//         setBrand(data.brand);
-//         setCategory(data.category);
-//         setCountInStock(data.countInStock);
-//         setDescription(data.description);
-
-//         setError(null);
-//       } catch (err) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (userInfo && userInfo.isAdmin) {
-//       fetchProductDetails();
-//     } else {
-//       navigate("/login");
-//     }
-//   }, [id, userInfo, navigate]);
-
-//   // Handle form submission to update the product
-//   const submitHandler = async (e) => {
-//     e.preventDefault();
-//     setLoadingUpdate(true);
-//     setErrorUpdate(null);
-
-//     try {
-//       const res = await fetch(`http://localhost:5000/api/products/${id}`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${userInfo.token}`,
-//         },
-//         body: JSON.stringify({
-//           name,
-//           price: Number(price),
-//           image,
-//           brand,
-//           category,
-//           countInStock: Number(countInStock),
-//           description,
-//         }),
-//       });
-
-//       const data = await res.json();
-//       if (!res.ok) throw new Error(data.message || "Failed to update product");
-
-//       showNotification("Product updated successfully!", "success");
-//       navigate("/admin/productlist");
-//     } catch (err) {
-//       setErrorUpdate(err.message);
-//       showNotification(`Error: ${err.message}`, "error");
-//     } finally {
-//       setLoadingUpdate(false);
-//     }
-//   };
-
-//   // --- LOADING & ERROR UI ---
-//   if (loading)
-//     return (
-//       <div className="flex justify-center items-center min-h-screen">
-//         <p className="text-gray-600 text-lg">Loading product data...</p>
-//       </div>
-//     );
-
-//   if (error)
-//     return (
-//       <div className="flex justify-center items-center min-h-screen">
-//         <p className="text-red-600 text-lg">{error}</p>
-//       </div>
-//     );
-
-//   // --- MAIN FORM UI ---
-//   return (
-//     <div className="flex justify-center py-12 px-4 bg-gray-50 min-h-screen">
-//       <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-10">
-//         <h1 className="text-3xl font-semibold text-gray-800 mb-8 text-center">Edit Product</h1>
-
-//         {/* Update error message */}
-//         {errorUpdate && (
-//           <p className="bg-red-100 text-red-700 px-4 py-2 mb-6 rounded-md border border-red-300 text-center">
-//             {errorUpdate}
-//           </p>
-//         )}
-
-//         <form onSubmit={submitHandler} className="space-y-6">
-//           <div>
-//             <label htmlFor="name" className="block text-gray-700 font-medium mb-1">
-//               Name
-//             </label>
-//             <input
-//               id="name"
-//               type="text"
-//               value={name}
-//               onChange={(e) => setName(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="Product name"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="price" className="block text-gray-700 font-medium mb-1">
-//               Price ($)
-//             </label>
-//             <input
-//               id="price"
-//               type="number"
-//               min={0}
-//               step="0.01"
-//               value={price}
-//               onChange={(e) => setPrice(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="0.00"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="image" className="block text-gray-700 font-medium mb-1">
-//               Image URL or Path
-//             </label>
-//             <input
-//               id="image"
-//               type="text"
-//               value={image}
-//               onChange={(e) => setImage(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="https://example.com/image.jpg"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="brand" className="block text-gray-700 font-medium mb-1">
-//               Brand
-//             </label>
-//             <input
-//               id="brand"
-//               type="text"
-//               value={brand}
-//               onChange={(e) => setBrand(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="Brand name"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="category" className="block text-gray-700 font-medium mb-1">
-//               Category
-//             </label>
-//             <input
-//               id="category"
-//               type="text"
-//               value={category}
-//               onChange={(e) => setCategory(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="Category"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="countInStock" className="block text-gray-700 font-medium mb-1">
-//               Count In Stock
-//             </label>
-//             <input
-//               id="countInStock"
-//               type="number"
-//               min={0}
-//               value={countInStock}
-//               onChange={(e) => setCountInStock(e.target.value)}
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="0"
-//             />
-//           </div>
-
-//           <div>
-//             <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
-//               Description
-//             </label>
-//             <textarea
-//               id="description"
-//               value={description}
-//               onChange={(e) => setDescription(e.target.value)}
-//               rows="4"
-//               required
-//               className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-//               placeholder="Product description"
-//             ></textarea>
-//           </div>
-
-//           <button
-//             type="submit"
-//             disabled={loadingUpdate}
-//             className={`w-full py-3 text-white rounded-md font-semibold transition ${
-//               loadingUpdate
-//                 ? "bg-blue-400 cursor-not-allowed"
-//                 : "bg-blue-600 hover:bg-blue-700"
-//             }`}
-//           >
-//             {loadingUpdate ? "Updating..." : "Update Product"}
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // Export the component as default export
-// export default ProductEditPage;
-
-// FILE: client/src/pages/ProductEditPage.jsx (Updated with Image Upload)
+// FILE: client/src/pages/adminpages/ProductEditPage.jsx (Corrected with Tags Pre-fill)
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useNotification } from "../../context/NotificationContext";
+import { FiUploadCloud, FiTrash2, FiX } from 'react-icons/fi';
 
 const ProductEditPage = ({ id, navigate }) => {
+  // --- STATE MANAGEMENT ---
   const { userInfo } = useAuth();
   const { showNotification } = useNotification();
 
-  // --- Form fields states ---
+  // Form fields state.
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState([]);
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
+  // State for the product tags
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState('');
 
-  // --- UI states ---
+  // UI states for loading, errors, and uploads
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [errorUpdate, setErrorUpdate] = useState(null);
-  // NEW: State to track the image upload process
   const [uploading, setUploading] = useState(false);
 
-  // Fetch product details when component mounts
+  // --- DATA FETCHING ---
+  // Fetches the product details when the component mounts.
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -294,16 +39,23 @@ const ProductEditPage = ({ id, navigate }) => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to fetch product");
 
-        // Pre-fill the form fields with existing product data
+        // Pre-fill the form fields with the fetched product data.
         setName(data.name);
         setPrice(data.price);
-        setImage(data.image);
+        setImages(data.images || []);
         setBrand(data.brand);
         setCategory(data.category);
         setCountInStock(data.countInStock);
         setDescription(data.description);
+        
+        // --- THIS IS THE FIX ---
+        // We now correctly set the `tags` state with the data fetched from the server.
+        // The `|| []` ensures that if a product has no tags, it defaults to an empty array.
+        setTags(data.tags || []);
+
       } catch (err) {
         setError(err.message);
+        showNotification(`Error: ${err.message}`, 'error');
       } finally {
         setLoading(false);
       }
@@ -314,15 +66,13 @@ const ProductEditPage = ({ id, navigate }) => {
     } else {
       navigate("/login");
     }
-  }, [id, userInfo, navigate]);
+  }, [id, userInfo, navigate, showNotification]);
 
   // --- HANDLERS ---
-
-  // Handle form submission to update the product details
+  // Handles the main form submission to update the product.
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoadingUpdate(true);
-    setErrorUpdate(null);
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
@@ -330,49 +80,45 @@ const ProductEditPage = ({ id, navigate }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo.token}`,
         },
+        // The body now sends the `tags` array to the backend.
         body: JSON.stringify({
-          name,
-          price: Number(price),
-          image,
-          brand,
-          category,
-          countInStock: Number(countInStock),
-          description,
+          name, price: Number(price), images, brand, category,
+          countInStock: Number(countInStock), description, tags,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update product");
       showNotification("Product updated successfully!", "success");
-      navigate("/admin/productlist");
+      window.location.href = '/admin/productlist';
     } catch (err) {
-      setErrorUpdate(err.message);
       showNotification(`Error: ${err.message}`, "error");
     } finally {
       setLoadingUpdate(false);
     }
   };
 
-  // NEW: Handle the file upload process
+  // Handles the file upload process for multiple images.
   const uploadFileHandler = async (e) => {
-    const file = e.target.files[0]; // Get the selected file
+    const files = e.target.files;
+    if (files.length === 0) return;
+
     const formData = new FormData();
-    formData.append("image", file); // 'image' must match the field name in our backend route
+    for (let i = 0; i < files.length; i++) {
+      formData.append("images", files[i]);
+    }
     setUploading(true);
 
     try {
       const res = await fetch("/api/upload", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
+        headers: { Authorization: `Bearer ${userInfo.token}` },
         body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Image upload failed");
 
-      // If upload is successful, set the image state with the URL from Cloudinary
-      setImage(data.image);
-      showNotification("Image uploaded successfully!", "success");
+      setImages(prevImages => [...prevImages, ...data.images]);
+      showNotification("Images uploaded successfully!", "success");
     } catch (error) {
       showNotification(error.message, "error");
     } finally {
@@ -380,176 +126,128 @@ const ProductEditPage = ({ id, navigate }) => {
     }
   };
 
-  // --- LOADING & ERROR UI ---
-  if (loading) return <p>Loading product data...</p>;
-  if (error) return <p className="text-red-600">{error}</p>;
+  const handleRemoveImage = (imageUrlToRemove) => {
+    setImages(prevImages => prevImages.filter(url => url !== imageUrlToRemove));
+  };
+  
+  // --- TAG HANDLERS ---
+  // Handles adding a new tag when the user presses Enter or Comma.
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const newTag = tagInput.trim();
+      if (newTag && !tags.includes(newTag)) {
+        setTags([...tags, newTag]);
+      }
+      setTagInput('');
+    }
+  };
 
-  // --- MAIN FORM UI ---
+  // Handles removing a tag when the 'x' is clicked.
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+
+  // --- RENDER LOGIC ---
+  if (loading) return <p className="text-center py-12">Loading product data...</p>;
+  if (error) return <p className="text-center py-12 text-red-600">{error}</p>;
+
   return (
-    <div className="flex justify-center py-12 px-4 bg-gray-50 min-h-screen">
-      <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-10">
-        <h1 className="text-3xl font-semibold text-gray-800 mb-8 text-center">
-          Edit Product
-        </h1>
-
-        {errorUpdate && (
-          <p className="bg-red-100 text-red-700 p-3 mb-6 rounded-md text-center">
-            {errorUpdate}
-          </p>
-        )}
-
-        <form onSubmit={submitHandler} className="space-y-6">
-          {/* ... (Name, Price fields remain the same) ... */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Product name"
-            />
+    <div className="bg-[#F8F5F2] min-h-screen p-4 sm:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-4xl font-serif font-bold text-[#D98A7E] mb-2">Edit Product</h1>
+          <p className="text-gray-500 mb-8">Update the details for your product below.</p>
+        </motion.div>
+        
+        <form onSubmit={submitHandler} className="space-y-8">
+          <div className="bg-white p-8 rounded-2xl shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">Core Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Name, Price, Brand, Category, etc. fields remain the same */}
+              <div>
+                <label htmlFor="name" className="block font-semibold text-gray-700 mb-1">Name</label>
+                <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
+              </div>
+              <div>
+                <label htmlFor="price" className="block font-semibold text-gray-700 mb-1">Price ($)</label>
+                <input id="price" type="number" min={0} step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
+              </div>
+              <div>
+                <label htmlFor="brand" className="block font-semibold text-gray-700 mb-1">Brand</label>
+                <input id="brand" type="text" value={brand} onChange={(e) => setBrand(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
+              </div>
+              <div>
+                <label htmlFor="category" className="block font-semibold text-gray-700 mb-1">Category</label>
+                <input id="category" type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="countInStock" className="block font-semibold text-gray-700 mb-1">Count In Stock</label>
+                <input id="countInStock" type="number" min={0} value={countInStock} onChange={(e) => setCountInStock(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="description" className="block font-semibold text-gray-700 mb-1">Description</label>
+                <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows="5" required className="w-full border border-gray-300 rounded-lg px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition"></textarea>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Price ($)
-            </label>
-            <input
-              id="price"
-              type="number"
-              min={0}
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="0.00"
-            />
+          <div className="bg-white p-8 rounded-2xl shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-6">Product Images</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {images.map((imgUrl, index) => (
+                <div key={index} className="relative group">
+                  <img src={imgUrl} alt={`Product image ${index + 1}`} className="w-full h-32 object-cover rounded-lg border border-gray-200" />
+                  <button type="button" onClick={() => handleRemoveImage(imgUrl)} className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                    <FiTrash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <label htmlFor="image-file" className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 hover:border-[#D4A28E] cursor-pointer transition-colors">
+                <FiUploadCloud className="w-8 h-8 mb-2" />
+                <span className="text-sm font-semibold">Upload Images</span>
+                <input id="image-file" type="file" multiple onChange={uploadFileHandler} className="hidden" />
+              </label>
+            </div>
+            {uploading && <div className="mt-4 text-center text-gray-600">Uploading...</div>}
           </div>
 
-          {/* --- NEW: IMAGE UPLOAD FIELD --- */}
-          <div>
-            <label
-              htmlFor="image"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Image
-            </label>
-            <input
-              id="image-url"
-              type="text"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Enter image URL or upload"
-            />
-            <input
-              id="image-file"
-              type="file"
-              onChange={uploadFileHandler}
-              className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-            {/* Show a spinner while uploading */}
-            {uploading && <div className="mt-2 text-center">Uploading...</div>}
+          {/* --- TAGS INPUT SECTION --- */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Search Tags</h2>
+            <p className="text-sm text-gray-500 mb-4">Add keywords to improve search results. Press Enter or comma to add a tag.</p>
+            <div className="flex flex-wrap items-center gap-2 p-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#D4A28E] transition">
+              {tags.map((tag, index) => (
+                <div key={index} className="flex items-center gap-1 bg-[#FADCD9] text-[#D98A7E] font-semibold px-3 py-1 rounded-full">
+                  <span>{tag}</span>
+                  <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500">
+                    <FiX size={14} />
+                  </button>
+                </div>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder={tags.length === 0 ? "Add tags..." : ""}
+                className="flex-grow bg-transparent p-1 focus:outline-none"
+              />
+            </div>
           </div>
 
-          {/* ... (Brand, Category, Count In Stock, Description fields remain the same) ... */}
-          <div>
-            <label
-              htmlFor="brand"
-              className="block text-gray-700 font-medium mb-1"
+          <div className="flex justify-end pt-4">
+            <motion.button
+              type="submit"
+              disabled={loadingUpdate || uploading}
+              className="bg-[#D4A28E] text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:bg-[#C8907A] transition-all disabled:opacity-50"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Brand
-            </label>
-            <input
-              id="brand"
-              type="text"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Brand name"
-            />
+              {loadingUpdate ? "Updating..." : "Update Product"}
+            </motion.button>
           </div>
-
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Category
-            </label>
-            <input
-              id="category"
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Category"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="countInStock"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Count In Stock
-            </label>
-            <input
-              id="countInStock"
-              type="number"
-              min={0}
-              value={countInStock}
-              onChange={(e) => setCountInStock(e.target.value)}
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="0"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-gray-700 font-medium mb-1"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows="4"
-              required
-              className="w-full border border-gray-300 rounded-md px-4 py-3 resize-y focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              placeholder="Product description"
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loadingUpdate}
-            className={`w-full py-3 text-white rounded-md font-semibold transition ${
-              loadingUpdate
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            {loadingUpdate ? "Updating..." : "Update Product"}
-          </button>
         </form>
       </div>
     </div>

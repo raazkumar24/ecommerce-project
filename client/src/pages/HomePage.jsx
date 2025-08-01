@@ -1,329 +1,48 @@
-// // FILE: client/src/pages/HomePage.jsx (Enhanced and Redesigned)
-
-// import React, { useState, useEffect, useCallback } from 'react';
-// import { motion, useAnimation, AnimatePresence } from 'framer-motion';
-// import { useInView } from 'react-intersection-observer';
-// import Rating from '../components/common/Rating';
-
-// const HomePage = ({ navigate }) => {
-//   // --- STATE MANAGEMENT ---
-//   // State to hold the products fetched for the slider and deal poster
-//   const [featuredProducts, setFeaturedProducts] = useState([]);
-//   // State for the single product to be featured in the "Deal of the Day" poster
-//   const [dealProduct, setDealProduct] = useState(null);
-//   // State to manage the loading UI
-//   const [loading, setLoading] = useState(true);
-//   // State to track the current slide in the featured product carousel
-//   const [currentSlide, setCurrentSlide] = useState(0);
-//   // State for the countdown timer
-//   const [timeLeft, setTimeLeft] = useState({});
-
-//   // --- HOOKS FOR ANIMATIONS ---
-//   // These hooks from react-intersection-observer and framer-motion work together
-//   // to trigger animations only when a section scrolls into the user's view.
-//   const heroControls = useAnimation();
-//   const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.2 });
-
-//   const dealControls = useAnimation();
-//   const [dealRef, dealInView] = useInView({ triggerOnce: true, threshold: 0.2 });
-
-//   const featuresControls = useAnimation();
-//   const [featuresRef, featuresInView] = useInView({ triggerOnce: true, threshold: 0.2 });
-
-//   const categoryControls = useAnimation();
-//   const [categoryRef, categoryInView] = useInView({ triggerOnce: true, threshold: 0.2 });
-
-//   // --- DATA FETCHING ---
-//   // Fetches the first page of products to use for the featured slider and deal poster.
-//   useEffect(() => {
-//     const fetchFeaturedProducts = async () => {
-//       try {
-//         setLoading(true);
-//         const res = await fetch('api/products?pageNumber=1');
-//         const data = await res.json();
-//         if (!res.ok) throw new Error('Could not fetch products');
-        
-//         // Use the first product as the "Deal of the Day"
-//         if (data.products.length > 0) {
-//           setDealProduct(data.products[0]);
-//         }
-//         // Use the next 5 products for the carousel for a better sliding experience
-//         setFeaturedProducts(data.products.slice(1, 6));
-
-//       } catch (err) {
-//         console.error("Failed to fetch featured products:", err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchFeaturedProducts();
-//   }, []);
-
-//   // --- ANIMATION TRIGGERS ---
-//   // This effect starts the animation for each section when it becomes visible on screen.
-//   useEffect(() => {
-//     if (heroInView) heroControls.start('visible');
-//     if (dealInView) dealControls.start('visible');
-//     if (featuresInView) featuresControls.start('visible');
-//     if (categoryInView) categoryControls.start('visible');
-//   }, [heroControls, heroInView, dealControls, dealInView, featuresControls, featuresInView, categoryControls, categoryInView]);
-  
-//   // --- SLIDER & COUNTDOWN LOGIC ---
-//   // Memoized function to advance to the next slide, wrapped in useCallback for performance.
-//   const nextSlide = useCallback(() => {
-//     if (featuredProducts.length > 0) {
-//       setCurrentSlide((prev) => (prev === featuredProducts.length - 1 ? 0 : prev + 1));
-//     }
-//   }, [featuredProducts.length]);
-
-//   // This effect sets up the auto-sliding interval for the carousel.
-//   useEffect(() => {
-//     if (featuredProducts.length > 1) {
-//       const slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-//       return () => clearInterval(slideInterval); // Cleanup interval on component unmount
-//     }
-//   }, [featuredProducts.length, nextSlide]);
-
-//   // This effect runs the countdown timer for the "Deal of the Day"
-//   useEffect(() => {
-//     const timer = setInterval(() => {
-//       const difference = +new Date().setHours(24, 0, 0, 0) - +new Date();
-//       if (difference > 0) {
-//         setTimeLeft({
-//           hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-//           minutes: Math.floor((difference / 1000 / 60) % 60),
-//           seconds: Math.floor((difference / 1000) % 60),
-//         });
-//       }
-//     }, 1000);
-//     return () => clearInterval(timer);
-//   }, []);
-
-//   // --- ANIMATION VARIANTS ---
-//   // Defines reusable animation properties for Framer Motion.
-//   const containerVariants = {
-//     hidden: { opacity: 0 },
-//     visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
-//   };
-
-//   const itemVariants = {
-//     hidden: { y: 20, opacity: 0 },
-//     visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } },
-//   };
-
-//   // --- STATIC DATA FOR UI ---
-//   const categories = [
-//     { name: 'Electronics', image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?q=80&w=2564&auto=format&fit=crop' }, 
-//     { name: 'Fashion', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2671&auto=format&fit=crop' },
-//     { name: 'Home Goods', image: 'https://images.unsplash.com/photo-1556020685-ae41abfc9365?q=80&w=2574&auto=format&fit=crop' }, 
-//     { name: 'Sports', image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2370&auto=format&fit=crop' },
-//   ];
-//   const features = [
-//     { icon: '🚚', title: 'Fast Shipping', text: 'Get your orders delivered to your doorstep in record time.' },
-//     { icon: '💎', title: 'Premium Quality', text: 'We only source the best products from trusted suppliers.' },
-//     { icon: '📞', title: '24/7 Support', text: 'Our team is always here to help you with any questions.' },
-//   ];
-
-//   return (
-//     <div className="bg-gradient-to-bl from-[#ffe4e6]  to-[#ccfbf1] text-gray-800">
-//       {/* Hero Section: The main welcome area with a dynamic product carousel. */}
-//       <motion.section
-//         ref={heroRef}
-//         initial="hidden"
-//         animate={heroControls}
-//         variants={containerVariants}
-//         className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden"
-//       >
-//         <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#dbeafe_1px,transparent_1px)] [background-size:24px_24px]"></div>
-//         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 max-w-6xl mx-auto">
-//           <div className="text-center lg:text-left">
-//             <motion.h1 variants={itemVariants} className="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight">
-//               Style Meets
-//               <br />
-//               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-//                 Innovation.
-//               </span>
-//             </motion.h1>
-//             <motion.p variants={itemVariants} className="mt-6 text-lg text-gray-600 max-w-lg mx-auto lg:mx-0">
-//               Discover a curated selection of high-quality products designed to enhance your lifestyle.
-//             </motion.p>
-//             <motion.div variants={itemVariants} className="mt-10">
-//               <motion.button
-//                 onClick={() => navigate('/products')}
-//                 className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-4 px-10 rounded-full text-lg shadow-lg"
-//                 whileHover={{ scale: 1.05, boxShadow: '0px 10px 20px rgba(0,0,0,0.1)' }}
-//                 whileTap={{ scale: 0.95 }}
-//                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-//               >
-//                 Explore Collection
-//               </motion.button>
-//             </motion.div>
-//           </div>
-//           <div className=" lg:flex w-full h-96 items-center justify-center">
-           
-//             {loading ? <div className="w-full h-full bg-gray-200 rounded-2xl animate-pulse"></div> : (
-//               <div className="relative w-full h-full">
-//                 <AnimatePresence>
-//                   <motion.div
-//                     key={currentSlide}
-//                     className="absolute w-full h-full"
-//                     initial={{ opacity: 0, scale: 0.9 }}
-//                     animate={{ opacity: 1, scale: 1 }}
-//                     exit={{ opacity: 0, scale: 0.9 }}
-//                     transition={{ duration: 0.5 }}
-//                     onClick={() => featuredProducts.length > 0 && navigate(`/products/${featuredProducts[currentSlide]._id}`)}
-//                   >
-//                     <img src={featuredProducts[currentSlide]?.image} alt={featuredProducts[currentSlide]?.name} className="w-full h-full object-contain drop-shadow-2xl"/>
-//                   </motion.div>
-//                 </AnimatePresence>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </motion.section>
-
-//       {/* Deal Poster Section: An eye-catching promotional block with a countdown. */}
-//       {dealProduct && (
-//         <motion.section
-//           ref={dealRef}
-//           initial="hidden"
-//           animate={dealControls}
-//           variants={containerVariants}
-//           className="py-20 px-4 bg-gray-900"
-//         >
-//           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-//             <motion.div variants={itemVariants} className="h-80 w-full">
-//               <img src={dealProduct.image || 'https://placehold.co/600x600/e2e8f0/333?text=Deal'} alt={dealProduct.name} className="w-full h-full object-contain"/>
-//             </motion.div>
-//             <motion.div variants={itemVariants} className="p-8 text-center md:text-left">
-//               <h2 className="text-sm font-bold uppercase text-indigo-400 tracking-wider">Deal of the Day</h2>
-//               <h3 className="text-3xl md:text-4xl font-bold text-white mt-2">{dealProduct.name}</h3>
-//               <div className="mt-4 flex justify-center md:justify-start">
-//                 <Rating value={dealProduct.rating} text={`${dealProduct.numReviews} reviews`} />
-//               </div>
-//               <div className="mt-6 flex justify-center md:justify-start items-center gap-4">
-//                 <span className="text-4xl font-bold text-white">${dealProduct.price.toFixed(2)}</span>
-//                 <span className="text-xl text-gray-400 line-through">${(dealProduct.price * 1.3).toFixed(2)}</span>
-//               </div>
-//               <div className="mt-6 flex justify-center md:justify-start gap-4">
-//                 <div className="text-center"><div className="text-2xl font-bold text-white">{String(timeLeft.hours || '00').padStart(2, '0')}</div><div className="text-xs text-gray-400">Hours</div></div>
-//                 <div className="text-2xl font-bold text-white">:</div>
-//                 <div className="text-center"><div className="text-2xl font-bold text-white">{String(timeLeft.minutes || '00').padStart(2, '0')}</div><div className="text-xs text-gray-400">Minutes</div></div>
-//                 <div className="text-2xl font-bold text-white">:</div>
-//                 <div className="text-center"><div className="text-2xl font-bold text-white">{String(timeLeft.seconds || '00').padStart(2, '0')}</div><div className="text-xs text-gray-400">Seconds</div></div>
-//               </div>
-//               <motion.button
-//                 onClick={() => navigate(`/products/${dealProduct._id}`)}
-//                 className="mt-8 bg-white text-indigo-600 font-bold py-3 px-8 rounded-full text-base shadow-lg"
-//                 whileHover={{ scale: 1.05, y: -2 }}
-//                 whileTap={{ scale: 0.95 }}
-//               >
-//                 View Deal
-//               </motion.button>
-//             </motion.div>
-//           </div>
-//         </motion.section>
-//       )}
-
-//       {/* Shop by Category Section: Redesigned with images for better visual impact. */}
-//       <motion.section 
-//         ref={categoryRef}
-//         initial="hidden"
-//         animate={categoryControls}
-//         variants={containerVariants}
-//         className="py-20 px-4"
-//       >
-//         <div className="max-w-6xl mx-auto">
-//           <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center mb-4">Shop by Category</motion.h2>
-//           <motion.p variants={itemVariants} className="text-center text-gray-500 mb-12">Find exactly what you're looking for by browsing our curated categories.</motion.p>
-//           <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-//             {categories.map((cat) => (
-//               <motion.div 
-//                 key={cat.name}
-//                 variants={itemVariants}
-//                 whileHover={{ y: -5, boxShadow: '0px 10px 20px rgba(0,0,0,0.08)' }}
-//                 className="relative bg-white rounded-xl shadow-md text-center cursor-pointer h-64 overflow-hidden group"
-//                 onClick={() => navigate(`/category/${cat.name.toLowerCase()}`)}
-//               >
-//                 <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"/>
-//                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-//                   <h3 className="font-bold text-2xl text-white drop-shadow-md">{cat.name}</h3>
-//                 </div>
-//               </motion.div>
-//             ))}
-//           </motion.div>
-//         </div>
-//       </motion.section>
-
-//       {/* Features Section: "Why Choose Us?" to build trust. */}
-//       <motion.section 
-//         ref={featuresRef}
-//         initial="hidden"
-//         animate={featuresControls}
-//         variants={containerVariants}
-//         className="py-20 px-4"
-//       >
-//         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-//           {features.map((feature) => (
-//             <motion.div key={feature.title} variants={itemVariants} className="text-center p-6">
-//               <div className="text-5xl mb-4 inline-block p-4 bg-indigo-100 text-indigo-600 rounded-full">{feature.icon}</div>
-//               <h3 className="font-bold text-lg text-gray-800">{feature.title}</h3>
-//               <p className="text-gray-500 text-sm mt-1">{feature.text}</p>
-//             </motion.div>
-//           ))}
-//         </div>
-//       </motion.section>
-//     </div>
-//   );
-// };
-
-// export default HomePage;
-
+// FILE: client/src/pages/HomePage.jsx (Completely Redesigned & Fully Responsive)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import Rating from '../components/common/Rating';
+import Tilt from 'react-parallax-tilt'; // For the 3D hover effect
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
+import Rating from '../components/common/Rating'; // Import the Rating component
 
 const HomePage = ({ navigate }) => {
-  // State management
+  // --- STATE MANAGEMENT ---
+  // Holds the list of products for the interactive hero showcase
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [dealProduct, setDealProduct] = useState(null);
+  // Tracks the index of the currently displayed product in the showcase
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  // Manages the loading UI while fetching data
   const [loading, setLoading] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+  // State for the quantity selector
+  const [quantity, setQuantity] = useState(1);
+
+  // --- HOOKS ---
+  const { addToCart } = useCart();
+  const { userInfo } = useAuth();
+  const { showNotification } = useNotification();
+  const heroControls = useAnimation();
+  const [heroRef, heroInView] = useInView({ 
+    triggerOnce: true, 
+    threshold: 0.3 // Trigger when 30% of the element is visible
   });
 
-  // Animation hooks
-  const heroControls = useAnimation();
-  const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
-  const dealControls = useAnimation();
-  const [dealRef, dealInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
-  const featuresControls = useAnimation();
-  const [featuresRef, featuresInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
-  const categoryControls = useAnimation();
-  const [categoryRef, categoryInView] = useInView({ triggerOnce: true, threshold: 0.1 });
-
-  // Fetch products
+  // --- DATA FETCHING ---
+  // Fetch first 4 products to feature in the hero showcase
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
         setLoading(true);
-        const res = await fetch('api/products?pageNumber=1');
-        const data = await res.json();
+        const res = await fetch('/api/products?pageNumber=1');
         if (!res.ok) throw new Error('Could not fetch products');
+        const data = await res.json();
         
-        if (data.products.length > 0) {
-          setDealProduct(data.products[0]);
+        if (data.products?.length > 0) {
+          setFeaturedProducts(data.products.slice(0, 4)); // Get first 4 products
         }
-        setFeaturedProducts(data.products.slice(1, 6));
-
       } catch (err) {
         console.error("Failed to fetch featured products:", err);
       } finally {
@@ -333,394 +52,238 @@ const HomePage = ({ navigate }) => {
     fetchFeaturedProducts();
   }, []);
 
-  // Animation triggers
+  // --- ANIMATION TRIGGERS ---
+  // Start hero animation when section comes into view
   useEffect(() => {
     if (heroInView) heroControls.start('visible');
-    if (dealInView) dealControls.start('visible');
-    if (featuresInView) featuresControls.start('visible');
-    if (categoryInView) categoryControls.start('visible');
-  }, [heroControls, heroInView, dealControls, dealInView, featuresControls, featuresInView, categoryControls, categoryInView]);
+  }, [heroInView, heroControls]);
   
-  // Slider logic
-  const nextSlide = useCallback(() => {
-    if (featuredProducts.length > 0) {
-      setCurrentSlide((prev) => (prev === featuredProducts.length - 1 ? 0 : prev + 1));
+  // --- HANDLERS ---
+  // Handle "Buy Now" button click
+  const handleBuyNow = () => {
+    if (!userInfo) {
+      showNotification('Please log in to make a purchase', 'error');
+      navigate('/login');
+      return;
     }
-  }, [featuredProducts.length]);
-
-  useEffect(() => {
-    if (featuredProducts.length > 1) {
-      const slideInterval = setInterval(nextSlide, 5000);
-      return () => clearInterval(slideInterval);
+    const productToAdd = featuredProducts[currentProductIndex];
+    if (productToAdd) {
+      const productWithQty = { ...productToAdd, qty: quantity };
+      addToCart(productWithQty);
+      showNotification(`${productToAdd.name} added to cart!`, 'success');
+      navigate('/cart');
     }
-  }, [featuredProducts.length, nextSlide]);
+  };
 
-  // Fixed Countdown timer
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const endOfDay = new Date();
-      endOfDay.setHours(23, 59, 59, 999); // Set to end of day
-      
-      const difference = endOfDay - now;
-      
-      if (difference > 0) {
-        setTimeLeft({
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
-        });
-      }
-    };
-
-    // Calculate immediately
-    calculateTimeLeft();
-    
-    // Then update every second
-    const timer = setInterval(calculateTimeLeft, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Animation variants
+  // --- ANIMATION VARIANTS ---
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1, 
       transition: { 
-        staggerChildren: 0.15,
-        when: "beforeChildren"
+        staggerChildren: 0.2, // Stagger child animations
+        delayChildren: 0.3 // Delay before starting
       } 
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { x: -20, opacity: 0 },
     visible: { 
-      y: 0, 
+      x: 0, 
       opacity: 1, 
       transition: { 
         type: 'spring', 
-        stiffness: 100,
-        damping: 10
+        stiffness: 100 // Spring animation stiffness
       } 
     },
   };
 
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.8 } }
-  };
-
-  // Static data
-  const categories = [
-    { name: 'Electronics', image: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?q=80&w=2564&auto=format&fit=crop' }, 
-    { name: 'Fashion', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2671&auto=format&fit=crop' },
-    { name: 'Home Goods', image: 'https://images.unsplash.com/photo-1556020685-ae41abfc9365?q=80&w=2574&auto=format&fit=crop' }, 
-    { name: 'Sports', image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=2370&auto=format&fit=crop' },
-  ];
-
-  const features = [
-    { icon: '🚚', title: 'Fast Shipping', text: 'Get your orders delivered to your doorstep in record time.' },
-    { icon: '💎', title: 'Premium Quality', text: 'We only source the best products from trusted suppliers.' },
-    { icon: '📞', title: '24/7 Support', text: 'Our team is always here to help you with any questions.' },
-  ];
+  // Get current product for display
+  const currentProduct = featuredProducts[currentProductIndex];
 
   return (
-    <div className="bg-gradient-to-br from-[#f0f4ff] via-[#f9f9f9] to-[#f0f4ff] text-gray-800">
-      {/* Hero Section */}
+    <div className="bg-[#FFF5F0] text-[#5C3A2E] min-h-screen font-sans">
+      {/* Main Hero Section */}
       <motion.section
         ref={heroRef}
         initial="hidden"
         animate={heroControls}
         variants={containerVariants}
-        className="relative min-h-screen w-full flex items-center justify-center overflow-hidden px-4 py-20"
+        className="relative min-h-screen w-full flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 py-16"
       >
-        {/* Background elements */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full filter blur-3xl opacity-30 animate-blob"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-tr from-pink-100 to-rose-100 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-gradient-to-tl from-blue-100 to-cyan-100 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-        </div>
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-12 max-w-7xl mx-auto">
-          <div className="text-center lg:text-left space-y-6">
+        {/* Content Container - Responsive grid layout */}
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 max-w-7xl mx-auto w-full">
+          
+          {/* Left Column: Text Content and Actions */}
+          <motion.div 
+            variants={containerVariants} 
+            className="lg:col-span-1 text-center lg:text-left flex flex-col items-center lg:items-start"
+          >
+            {/* Main Headline - Responsive font sizes */}
             <motion.h1 
-              variants={itemVariants}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight"
+              variants={itemVariants} 
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#D98A7E] leading-tight"
             >
-              Elevate Your{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-                Lifestyle
-              </span>
+              e-commerce Website
             </motion.h1>
             
+            {/* Subtitle */}
             <motion.p 
-              variants={itemVariants}
-              className="text-lg md:text-xl text-gray-600 max-w-lg mx-auto lg:mx-0"
+              variants={itemVariants} 
+              className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-500 uppercase tracking-widest"
             >
-              Discover curated products that blend innovation with exceptional design for your modern life.
+              Support Local Everything
             </motion.p>
             
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <motion.button
-                onClick={() => navigate('/products')}
-                className="relative overflow-hidden bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all duration-300 group"
-                whileHover={{ y: -3 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="relative z-10">Shop Now</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-violet-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </motion.button>
-              
-              <motion.button
-                onClick={() => navigate('/deals')}
-                className="relative overflow-hidden bg-white text-gray-800 font-bold py-4 px-8 rounded-xl text-lg shadow-md hover:shadow-lg transition-all duration-300 group border border-gray-200"
-                whileHover={{ y: -3 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="relative z-10">View Deals</span>
-                <span className="absolute inset-0 bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </motion.button>
-            </motion.div>
-          </div>
-          
-          {/* Improved Image Showcase */}
-          <div className="relative w-full h-96 lg:h-[500px] flex items-center justify-center">
-            {loading ? (
-              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl animate-pulse"></div>
-            ) : (
-              <div className="relative w-full h-full">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentSlide}
-                    className="absolute w-full h-full cursor-pointer"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    onClick={() => featuredProducts.length > 0 && navigate(`/products/${featuredProducts[currentSlide]._id}`)}
+            {/* Quantity Selector - Responsive sizing */}
+            <motion.div 
+              variants={itemVariants} 
+              className="mt-6 sm:mt-8 md:mt-10 w-full max-w-xs"
+            >
+              <div className="bg-white/50 p-3 sm:p-4 rounded-xl shadow-sm border border-white">
+                <label className="font-semibold text-gray-600 text-sm sm:text-base">
+                  Choose your quantity
+                </label>
+                <div className="flex items-center justify-between mt-2">
+                  <button 
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white text-lg font-bold shadow transition-transform hover:scale-110 active:scale-95"
+                    aria-label="Decrease quantity"
                   >
-                    {/* <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-white/20"></div> */}
-                    <div className="absolute inset-0 rounded-3xl overflow-hidden">
-                      {/* <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-violet-500/10"></div> */}
+                    -
+                  </button>
+                  <span className="text-lg sm:text-xl font-bold">
+                    {quantity}
+                  </span>
+                  <button 
+                    onClick={() => setQuantity(q => q + 1)} 
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white text-lg font-bold shadow transition-transform hover:scale-110 active:scale-95"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Buy Now Button - Responsive sizing */}
+            <motion.button
+              variants={itemVariants}
+              onClick={handleBuyNow}
+              className="mt-4 sm:mt-6 bg-[#D4A28E] text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-xl text-base sm:text-lg shadow-lg hover:bg-[#C8907A] transition-all duration-300 flex items-center gap-2 sm:gap-3"
+              whileHover={{ y: -3 }}
+              whileTap={{ scale: 0.98 }}
+              aria-label="Buy now"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3c-.6.6-.2 1.7.7 1.7H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              Buy Now
+            </motion.button>
+          </motion.div>
+
+          {/* Right Column: Product Showcase */}
+          <div className="lg:col-span-1 relative w-full h-[50vh] sm:h-[60vh] md:h-[70vh] flex items-center justify-center mt-8 lg:mt-0">
+            {/* Background decorative circle - Responsive sizing */}
+            <motion.div 
+              variants={itemVariants}
+              className="absolute w-[90%] sm:w-[80%] md:w-[100%] h-[90%] sm:h-[80%] md:h-[100%] bg-[#FADCD9] rounded-full"
+            />
+            
+            {/* Product Image with Loading State */}
+            <AnimatePresence mode="wait">
+              {loading ? (
+                <div className="w-full h-full bg-gray-200/50 rounded-3xl animate-pulse" />
+              ) : (
+                <motion.div
+                  key={currentProduct?._id || 'loading-image'}
+                  className="absolute w-full h-full"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {/* 3D Tilt Effect on Product Image */}
+                  <Tilt 
+                    tiltMaxAngleX={10} 
+                    tiltMaxAngleY={10} 
+                    className="w-full h-full"
+                    glareEnable={true}
+                    glareMaxOpacity={0.1}
+                    glarePosition="all"
+                  >
+                    <div 
+                      className="w-full h-full flex items-center justify-center p-15 sm:p-8 cursor-pointer"
+                      onClick={() => navigate(`/products/${currentProduct?._id}`)}
+                      aria-label={`View ${currentProduct?.name}`}
+                    >
                       <img 
-                        src={featuredProducts[currentSlide]?.image} 
-                        alt={featuredProducts[currentSlide]?.name} 
-                        className="w-full h-full object-contain p-8 transform hover:scale-105 transition-transform duration-500"
+                        src={currentProduct?.images[0]} 
+                        alt={currentProduct?.name} 
+                        className="w-full h-full object-contain drop-shadow-xl sm:drop-shadow-2xl"
+                        loading="lazy"
                       />
                     </div>
-                    {/* <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
-                      {featuredProducts.map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCurrentSlide(index);
-                          }}
-                          className={`w-3 h-3 rounded-full transition-all ${index === currentSlide ? 'bg-indigo-600 w-6' : 'bg-gray-300'}`}
-                          aria-label={`Go to slide ${index + 1}`}
-                        />
-                      ))}
-                    </div> */}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            )}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Deal of the Day Section */}
-      {dealProduct && (
-        <motion.section
-          ref={dealRef}
-          initial="hidden"
-          animate={dealControls}
-          variants={containerVariants}
-          className="py-16 px-4 bg-gradient-to-r from-gray-900 to-gray-800 relative overflow-hidden"
-        >
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-          </div>
-          
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+                  </Tilt>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
+            {/* Decorative Tags - Responsive positioning */}
             <motion.div 
-              variants={itemVariants}
-              className="relative h-80 md:h-96 w-full group"
+              variants={itemVariants} 
+              transition={{ delay: 0.4 }} 
+              className="absolute top-10 sm:top-20 left-0 sm:-left-10 bg-white/80 backdrop-blur-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow-lg text-xs sm:text-sm"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-violet-500/20 rounded-3xl blur-md group-hover:blur-lg transition-all duration-500"></div>
-              <img 
-                src={dealProduct.image || 'https://placehold.co/600x600/e2e8f0/333?text=Deal'} 
-                alt={dealProduct.name} 
-                className="relative w-full h-full object-contain p-8 z-10 transform group-hover:scale-105 transition-transform duration-500"
-              />
+              Minimalistic
+            </motion.div>
+            <motion.div 
+              variants={itemVariants} 
+              transition={{ delay: 0.6 }} 
+              className="absolute bottom-10 sm:bottom-15 right-0 sm:-right-10 bg-white/80 backdrop-blur-sm px-3 py-1 sm:px-4 sm:py-2 rounded-full shadow-lg text-xs sm:text-sm"
+            >
+              Super cozy!
             </motion.div>
             
-            <motion.div 
-              variants={itemVariants}
-              className="p-6 md:p-8 text-center md:text-left space-y-6"
-            >
-              <div className="inline-block px-4 py-2 bg-indigo-600/20 rounded-full backdrop-blur-sm">
-                <span className="text-sm font-bold uppercase text-indigo-300 tracking-wider">Deal of the Day</span>
-              </div>
-              
-              <h3 className="text-3xl md:text-4xl font-bold text-white">{dealProduct.name}</h3>
-              
-              <div className="flex justify-center md:justify-start">
-                <Rating 
-                  value={dealProduct.rating} 
-                  text={`${dealProduct.numReviews} reviews`} 
-                  color="text-amber-400"
-                />
-              </div>
-              
-              <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4">
-                <span className="text-4xl font-bold text-white bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                  ${dealProduct.price.toFixed(2)}
-                </span>
-                <span className="text-xl text-gray-400 line-through">${(dealProduct.price * 1.3).toFixed(2)}</span>
-                <span className="px-3 py-1 bg-rose-500/20 text-rose-400 rounded-full text-sm font-medium">
-                  {Math.round((1 - dealProduct.price / (dealProduct.price * 1.3)) * 100)}% OFF
-                </span>
-              </div>
-              
-              <div className="flex justify-center md:justify-start gap-3">
-                {Object.entries(timeLeft).map(([unit, value]) => (
-                  <div key={unit} className="text-center">
-                    <div className="w-20 h-20 flex items-center justify-center bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50">
-                      <span className="text-2xl font-bold text-white">
-                        {String(value).padStart(2, '0')}
-                      </span>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-400 uppercase tracking-wider">
-                      {unit.charAt(0).toUpperCase() + unit.slice(1)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <motion.button
-                onClick={() => navigate(`/products/${dealProduct._id}`)}
-                className="mt-6 relative overflow-hidden bg-white text-indigo-600 font-bold py-3 px-8 rounded-xl text-base shadow-lg hover:shadow-xl group"
-                whileHover={{ y: -3 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="relative z-10">Grab This Deal</span>
-                <span className="absolute inset-0 bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </motion.button>
-            </motion.div>
+            {/* Product Thumbnail Selector - Responsive layout (vertical on desktop, horizontal on mobile) */}
+            <div className="absolute bottom-0 sm:bottom-auto sm:right-0 sm:top-1/2 sm:-translate-y-1/2 h-auto sm:h-full w-full sm:w-auto flex sm:flex-col justify-center gap-2 sm:gap-3 p-2 sm:p-3 overflow-x-auto">
+              {featuredProducts.map((product, index) => (
+                <motion.div
+                  key={product._id}
+                  className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl border-2 cursor-pointer overflow-hidden shadow-md sm:shadow-lg transition-all duration-300 flex-shrink-0 ${
+                    currentProductIndex === index 
+                      ? 'border-white scale-110' 
+                      : 'border-transparent hover:border-white/50'
+                  }`}
+                  onClick={() => setCurrentProductIndex(index)}
+                  whileHover={{ scale: 1.1 }}
+                  aria-label={`View ${product.name}`}
+                >
+                  <img 
+                    src={product.images[0]} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </motion.section>
-      )}
-
-
-      {/* Categories Section */}
-      <motion.section 
-        ref={categoryRef}
-        initial="hidden"
-        animate={categoryControls}
-        variants={containerVariants}
-        className="py-20 px-4"
-      >
-        <div className="max-w-7xl mx-auto space-y-12">
-          <motion.div variants={itemVariants} className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold">Shop by Category</h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Explore our carefully curated collections tailored to your lifestyle needs
-            </p>
-          </motion.div>
-          
-          <motion.div 
-            variants={containerVariants}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {categories.map((cat) => (
-              <motion.div 
-                key={cat.name}
-                variants={itemVariants}
-                whileHover={{ y: -8 }}
-                className="relative group cursor-pointer rounded-2xl overflow-hidden h-64 shadow-lg"
-                onClick={() => navigate(`/category/${cat.name.toLowerCase()}`)}
-              >
-                <img 
-                  src={cat.image} 
-                  alt={cat.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex items-end p-6">
-                  <h3 className="font-bold text-2xl text-white transition-transform duration-300 group-hover:translate-y-1">
-                    {cat.name}
-                  </h3>
-                </div>
-                <div className="absolute inset-0 border-2 border-transparent group-hover:border-white/30 transition-all duration-500 rounded-2xl"></div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
-      </motion.section>
 
-      {/* Features Section */}
-      <motion.section 
-        ref={featuresRef}
-        initial="hidden"
-        animate={featuresControls}
-        variants={containerVariants}
-        className="py-20 px-4 bg-gradient-to-br from-white to-gray-50"
-      >
-        <div className="max-w-7xl mx-auto space-y-16">
-          <motion.div variants={itemVariants} className="text-center space-y-4">
-            <h2 className="text-3xl md:text-4xl font-bold">Why Choose Us?</h2>
-            <p className="text-lg text-gray-500 max-w-3xl mx-auto">
-              We're committed to providing an exceptional shopping experience
-            </p>
-          </motion.div>
-          
-          <motion.div 
-            variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            {features.map((feature) => (
-              <motion.div 
-                key={feature.title} 
-                variants={itemVariants}
-                whileHover={{ y: -5 }}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
-              >
-                <div className="text-5xl mb-6 w-20 h-20 flex items-center justify-center bg-gradient-to-br from-indigo-100 to-violet-100 rounded-2xl">
-                  {feature.icon}
-                </div>
-                <h3 className="font-bold text-xl text-gray-800 mb-3">{feature.title}</h3>
-                <p className="text-gray-500">{feature.text}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* CTA Section */}
-      <motion.section
-        initial="hidden"
-        animate={featuresControls}
-        variants={fadeIn}
-        className="py-20 px-4 bg-gradient-to-r from-indigo-600 to-violet-600"
-      >
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">
-            Ready to Transform Your Shopping Experience?
-          </h2>
-          <p className="text-xl text-indigo-100 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who shop with us every day
-          </p>
-          <motion.button
-            onClick={() => navigate('/products')}
-            className="relative overflow-hidden bg-white text-indigo-600 font-bold py-4 px-10 rounded-xl text-lg shadow-2xl hover:shadow-3xl group"
-            whileHover={{ y: -3, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span className="relative z-10">Start Shopping Now</span>
-            <span className="absolute inset-0 bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-          </motion.button>
-        </div>
+        {/* Continue Shopping Link - Responsive positioning */}
+        <a 
+          href="#deals" 
+          onClick={(e) => { e.preventDefault(); navigate('/products'); }} 
+          className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 text-gray-600 hover:text-gray-900 font-medium sm:font-semibold flex items-center gap-1 sm:gap-2 transition text-sm sm:text-base"
+          aria-label="Continue shopping"
+        >
+          Continue shopping
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
       </motion.section>
     </div>
   );
