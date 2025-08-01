@@ -147,13 +147,13 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const uploadRouter = express.Router(); // Use a unique variable name
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'E-Shop',
-    allowed_formats: ['jpeg', 'png', 'jpg', 'gif', 'webp'], // Added 'gif' and 'webp' for more flexibility
+    allowed_formats: ['jpeg', 'png', 'jpg'],
   },
 });
 
@@ -162,7 +162,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-router.post('/', protect, admin, upload.array('images', 5), (req, res) => {
+uploadRouter.post('/', protect, admin, upload.array('images', 5), (req, res) => {
   if (req.files && req.files.length > 0) {
     const imageUrls = req.files.map(file => file.path);
     res.status(200).send({
@@ -174,4 +174,4 @@ router.post('/', protect, admin, upload.array('images', 5), (req, res) => {
   }
 });
 
-export default router;
+export default uploadRouter;

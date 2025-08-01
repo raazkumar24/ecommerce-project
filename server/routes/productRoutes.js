@@ -29,8 +29,10 @@
 // export default router;
 
 
+
+
 import express from 'express';
-const router = express.Router();
+const productRouter = express.Router(); // Use a unique variable name
 import {
   getProducts, getAdminProducts, getProductById,
   createProduct, deleteProduct, updateProduct,
@@ -39,18 +41,17 @@ import {
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 // PUBLIC ROUTES
-router.get('/', getProducts);
-router.get('/:id', getProductById);
+productRouter.get('/', getProducts);
+productRouter.get('/:id', getProductById);
 
 // PROTECTED USER ROUTES
-router.post('/:id/reviews', protect, createProductReview);
-router.put('/:id/reviews', protect, updateProductReview);
+productRouter.post('/:id/reviews', protect, createProductReview);
+productRouter.put('/:id/reviews', protect, updateProductReview);
 
 // ADMIN ONLY ROUTES
-router.get('/admin', protect, admin, getAdminProducts);
-router.post('/', protect, admin, createProduct);
-router.put('/:id', protect, admin, updateProduct);
-router.delete('/:id', protect, admin, deleteProduct);
+productRouter.get('/admin/all', protect, admin, getAdminProducts);
+productRouter.post('/', protect, admin, createProduct);
+productRouter.put('/:id', protect, admin, updateProduct);
+productRouter.delete('/:id', protect, admin, deleteProduct);
 
-export default router;
-
+export default productRouter;
