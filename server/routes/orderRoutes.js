@@ -22,9 +22,8 @@
 // export default router;
 
 
-
 import express from 'express';
-const router = express.Router();
+const router_order = express.Router(); // Use a unique variable name
 import {
   addOrderItems, getOrderById, getMyOrders,
   getOrders, updateOrderToDelivered
@@ -32,12 +31,12 @@ import {
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 // PROTECTED USER ROUTES
-router.post('/', protect, addOrderItems);
-router.get('/myorders', protect, getMyOrders);
-router.get('/:id', protect, getOrderById);
+router_order.post('/', protect, addOrderItems);
+router_order.get('/myorders', protect, getMyOrders);
+router_order.get('/:id', protect, getOrderById);
 
 // ADMIN ONLY ROUTES
-router.get('/', protect, admin, getOrders);
-router.put('/:id/deliver', protect, admin, updateOrderToDelivered);
+router_order.get('/', protect, admin, getOrders);
+router_order.put('/:id/deliver', protect, admin, updateOrderToDelivered);
 
-export default router;
+export default router_order;

@@ -30,9 +30,6 @@
 // export default router;
 
 
-// =======================================================================
-// FILE 1 of 4: server/routes/userRoutes.js (Final Corrected Version)
-// =======================================================================
 
 import express from 'express';
 const router = express.Router();
@@ -48,7 +45,7 @@ router.post('/login', authUser);
 router.post('/', registerUser);
 
 // PROTECTED USER ROUTES
-router.get('/profile', protect, (req, res) => res.json(req.user)); // Example, can be expanded
+router.get('/profile', protect, (req, res) => res.json(req.user));
 router.put('/profile', protect, updateUserProfile);
 router.get('/cart', protect, getUserCart);
 router.post('/cart', protect, addToUserCart);
