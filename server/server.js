@@ -215,193 +215,111 @@
 // startServer();
 
 
-
-// orginal
-// import dotenv from 'dotenv';
-// import fs from 'fs';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-// import express from 'express';
-// import cors from 'cors';
-// import connectDB from './config/db.js';
-// import productRoutes from './routes/productRoutes.js';
-// import userRoutes from './routes/userRoutes.js';
-// import orderRoutes from './routes/orderRoutes.js';
-// import uploadRoutes from './routes/uploadRoutes.js';
-
-// // Configure environment variables
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-// const isProduction = process.env.NODE_ENV === 'production';
-// const PORT = process.env.PORT || 5000;
-
-// console.log('--- Starting Server ---');
-// console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
-// console.log(`Database: ${process.env.MONGO_URI ? 'Configured' : 'Missing configuration'}`);
-
-// const app = express();
-
-// // Middleware
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
-// app.use(cors({
-//   origin: isProduction 
-//     ? ['https://my-shop-r71y.onrender.com'] 
-//     : ['http://localhost:3000'],
-//   credentials: true
-// }));
-
-// // API Routes
-// app.use('/api/products', productRoutes);
-// app.use('/api/users', userRoutes);
-// app.use('/api/orders', orderRoutes);
-// app.use('/api/upload', uploadRoutes);
-
-// // Health check endpoint
-// app.get('/health', (req, res) => {
-//   res.status(200).json({ status: 'healthy' });
-// });
-
-// // Production configuration - Serve frontend
-// if (isProduction) {
-//   const clientPath = path.join(__dirname, '../client/dist');
-  
-//   // Verify client build exists
-//   if (!fs.existsSync(clientPath)) {
-//     console.error('❌ Client build not found. Run: cd client && npm run build');
-//     console.error(`Expected at: ${clientPath}`);
-//     process.exit(1);
-//   }
-
-//   // Serve static files
-//   app.use(express.static(clientPath));
-
-//   // Handle client-side routing
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(clientPath, 'index.html'));
-//   });
-// } else {
-//   // Development mode API info
-//   app.get('/', (req, res) => {
-//     res.json({
-//       message: 'E-Commerce API (Development Mode)',
-//       instructions: 'Frontend should be running on http://localhost:3000',
-//       endpoints: {
-//         products: '/api/products',
-//         users: '/api/users',
-//         orders: '/api/orders',
-//         uploads: '/api/upload'
-//       }
-//     });
-//   });
-// }
-
-// // Error handling middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({
-//     message: 'Something went wrong!',
-//     error: !isProduction ? err.message : undefined
-//   });
-// });
-
-// // Server startup
-// const startServer = async () => {
-//   try {
-//     await connectDB();
-//     app.listen(PORT, () => {
-//       console.log(`✅ Server running on port ${PORT}`);
-//       if (isProduction) {
-//         console.log(`🔗 Production URL: https://my-shop-khdn.onrender.com`);
-//       } else {
-//         console.log(`🔗 API: http://localhost:${PORT}/api`);
-//         console.log(`🔗 Frontend: http://localhost:3000 (must run separately)`);
-//       }
-//     });
-//   } catch (error) {
-//     console.error('❌ Failed to start server:', error);
-//     process.exit(1);
-//   }
-// };
-
-// startServer();
-
-
-// FILE: server/server.js (Final Corrected Version with CORS Fix)
-
 import dotenv from 'dotenv';
-// This line MUST be at the absolute top to load your secret keys.
-dotenv.config();
-
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db.js';
-
-// --- Route Imports ---
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 
+// Configure environment variables
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+const isProduction = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT || 5000;
+
+console.log('--- Starting Server ---');
+console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
+console.log(`Database: ${process.env.MONGO_URI ? 'Configured' : 'Missing configuration'}`);
+
 const app = express();
 
-// --- Middleware ---
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: isProduction 
+    ? ['https://my-shop-r71y.onrender.com'] 
+    : ['http://localhost:3000'],
+  credentials: true
+}));
 
-// --- THIS IS THE FIX ---
-// We are adding a more specific CORS configuration.
-// This tells your backend server to explicitly allow requests from your frontend
-// running on localhost:5173.
-const corsOptions = {
-  origin: 'http://localhost:5173',
-  optionsSuccessStatus: 200 // For legacy browser support
-};
-app.use(cors(corsOptions));
-
-
-// --- API Routes ---
-// All requests to these URLs will be handled by your API.
+// API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
 
-// --- DEPLOYMENT CONFIGURATION ---
-// This is the crucial block for making your frontend work on the live server.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Production configuration - Serve frontend
+if (isProduction) {
+  const clientPath = path.join(__dirname, '../client/dist');
+  
+  // Verify client build exists
+  if (!fs.existsSync(clientPath)) {
+    console.error('❌ Client build not found. Run: cd client && npm run build');
+    console.error(`Expected at: ${clientPath}`);
+    process.exit(1);
+  }
 
-// This check ensures this code only runs on the live Render server
-if (process.env.NODE_ENV === 'production') {
-  // 1. Statically serve the frontend's 'dist' folder.
-  app.use(express.static(path.join(__dirname, '../client/dist')));
+  // Serve static files
+  app.use(express.static(clientPath));
 
-  // 2. For any request that doesn't match an API route above, serve the main index.html file.
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, '../client', 'dist', 'index.html'))
-  );
+  // Handle client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
+  });
 } else {
-  // If not in production, have a simple test route for the root URL.
+  // Development mode API info
   app.get('/', (req, res) => {
-    res.send('API is running in development mode...');
+    res.json({
+      message: 'E-Commerce API (Development Mode)',
+      instructions: 'Frontend should be running on http://localhost:3000',
+      endpoints: {
+        products: '/api/products',
+        users: '/api/users',
+        orders: '/api/orders',
+        uploads: '/api/upload'
+      }
+    });
   });
 }
 
-// --- Server Startup ---
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong!',
+    error: !isProduction ? err.message : undefined
+  });
+});
+
+// Server startup
 const startServer = async () => {
   try {
     await connectDB();
     app.listen(PORT, () => {
-      console.log(`✅ Server is running on port ${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
+      if (isProduction) {
+        console.log(`🔗 Production URL: https://my-shop-khdn.onrender.com`);
+      } else {
+        console.log(`🔗 API: http://localhost:${PORT}/api`);
+        console.log(`🔗 Frontend: http://localhost:3000 (must run separately)`);
+      }
     });
   } catch (error) {
-    console.error(`❌ Failed to start server:`, error);
+    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 };
