@@ -24,20 +24,24 @@
 
 
 import express from 'express';
-const orderRouter = express.Router(); // Use a unique variable name
+const router = express.Router();
 import {
   addOrderItems, getOrderById, getMyOrders,
   getOrders, updateOrderToDelivered
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
+// USER AND ADMIN ROUTES for the base '/' endpoint
+router.route('/')
+  .post(protect, addOrderItems)
+  .get(protect, admin, getOrders);
+
 // PROTECTED USER ROUTES
-orderRouter.post('/', protect, addOrderItems);
-orderRouter.get('/myorders', protect, getMyOrders);
-orderRouter.get('/:id', protect, getOrderById);
+router.get('/myorders', protect, getMyOrders);
 
-// ADMIN ONLY ROUTES
-orderRouter.get('/', protect, admin, getOrders);
-orderRouter.put('/:id/deliver', protect, admin, updateOrderToDelivered);
+// ROUTES FOR A SPECIFIC ORDER ID
+router.route('/:id')
+  .get(protect, getOrderById)
+  .put(protect, admin, updateOrderToDelivered); // Note: Changed to PUT for consistency
 
-export default orderRouter;
+export default router;

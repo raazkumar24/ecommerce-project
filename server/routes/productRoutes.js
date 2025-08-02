@@ -30,9 +30,8 @@
 
 
 
-
 import express from 'express';
-const productRouter = express.Router(); // Use a unique variable name
+const router = express.Router();
 import {
   getProducts, getAdminProducts, getProductById,
   createProduct, deleteProduct, updateProduct,
@@ -40,18 +39,23 @@ import {
 } from '../controllers/productController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
-// PUBLIC ROUTES
-productRouter.get('/', getProducts);
-productRouter.get('/:id', getProductById);
+// PUBLIC & ADMIN ROUTES for the base '/' endpoint
+router.route('/')
+  .get(getProducts)
+  .post(protect, admin, createProduct);
 
-// PROTECTED USER ROUTES
-productRouter.post('/:id/reviews', protect, createProductReview);
-productRouter.put('/:id/reviews', protect, updateProductReview);
+// ADMIN ONLY ROUTE for getting all products without pagination
+router.get('/admin', protect, admin, getAdminProducts);
 
-// ADMIN ONLY ROUTES
-productRouter.get('/admin/all', protect, admin, getAdminProducts);
-productRouter.post('/', protect, admin, createProduct);
-productRouter.put('/:id', protect, admin, updateProduct);
-productRouter.delete('/:id', protect, admin, deleteProduct);
+// ROUTES for a specific product ID
+router.route('/:id')
+  .get(getProductById)
+  .put(protect, admin, updateProduct)
+  .delete(protect, admin, deleteProduct);
 
-export default productRouter;
+// ROUTES for product reviews
+router.route('/:id/reviews')
+  .post(protect, createProductReview)
+  .put(protect, updateProductReview);
+
+export default router;

@@ -31,8 +31,9 @@
 
 
 
+
 import express from 'express';
-const userRouter = express.Router(); // Use a unique variable name
+const router = express.Router();
 import {
   authUser, registerUser, updateUserProfile,
   getUserCart, addToUserCart, updateCartItemQuantity, removeFromUserCart,
@@ -41,21 +42,30 @@ import {
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 // PUBLIC ROUTES
-userRouter.post('/login', authUser);
-userRouter.post('/', registerUser);
+router.post('/login', authUser);
+
+// USER & ADMIN ROUTES for the base '/' endpoint
+router.route('/')
+  .post(registerUser) // For creating a new user
+  .get(protect, admin, getUsers); // For admins to get all users
 
 // PROTECTED USER ROUTES
-userRouter.put('/profile', protect, updateUserProfile);
-userRouter.get('/cart', protect, getUserCart);
-userRouter.post('/cart', protect, addToUserCart);
-userRouter.put('/cart', protect, updateCartItemQuantity);
-userRouter.delete('/cart/:productId', protect, removeFromUserCart);
-userRouter.get('/can-review/:productId', protect, checkUserCanReview);
+router.route('/profile')
+  .get(protect, (req, res) => res.json(req.user)) // A simple route to get the current user's profile
+  .put(protect, updateUserProfile);
 
-// ADMIN ONLY ROUTES
-userRouter.get('/', protect, admin, getUsers);
-userRouter.get('/:id', protect, admin, getUserById);
-userRouter.put('/:id', protect, admin, updateUser);
-userRouter.delete('/:id', protect, admin, deleteUser);
+router.route('/cart')
+  .get(protect, getUserCart)
+  .post(protect, addToUserCart)
+  .put(protect, updateCartItemQuantity);
 
-export default userRouter;
+router.delete('/cart/:productId', protect, removeFromUserCart);
+router.get('/can-review/:productId', protect, checkUserCanReview);
+
+// ADMIN ONLY ROUTES for specific users by ID
+router.route('/:id')
+  .get(protect, admin, getUserById)
+  .put(protect, admin, updateUser)
+  .delete(protect, admin, deleteUser);
+
+export default router;
