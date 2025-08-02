@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(userInfoFromStorage);
 
   const login = async (email, password) => {
-    const response = await fetch('http://localhost:5000/api/users/login', {
+    const response = await fetch('/api/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
-    const response = await fetch('http://localhost:5000/api/users', {
+    const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
