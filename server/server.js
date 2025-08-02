@@ -358,7 +358,7 @@ app.use(express.json());
 // This CORS configuration works for both local development and your live site.
 // Replace 'https://my-shop-khdn.onrender.com' with your actual live website URL.
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://my-shop-khdn.onrender.com'],
+  origin: ['http://localhost:5173', 'https://my-shop-r71y.onrender.com'],
   optionsSuccessStatus: 200 
 };
 app.use(cors(corsOptions));
