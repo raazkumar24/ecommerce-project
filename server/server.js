@@ -214,8 +214,6 @@
 
 // startServer();
 
-
-// FILE: server/server.js (Final Corrected Version with Explicit Path and Logging)
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -306,4 +304,3 @@ const startServer = async () => {
 };
 
 startServer();
-//sever startup
