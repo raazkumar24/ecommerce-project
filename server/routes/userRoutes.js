@@ -31,7 +31,6 @@
 
 
 
-
 import express from 'express';
 const router = express.Router();
 import {
@@ -43,15 +42,11 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 
 // PUBLIC ROUTES
 router.post('/login', authUser);
-
-// USER & ADMIN ROUTES for the base '/' endpoint
-router.route('/')
-  .post(registerUser) // For creating a new user
-  .get(protect, admin, getUsers); // For admins to get all users
+router.route('/').post(registerUser).get(protect, admin, getUsers);
 
 // PROTECTED USER ROUTES
 router.route('/profile')
-  .get(protect, (req, res) => res.json(req.user)) // A simple route to get the current user's profile
+  .get(protect, (req, res) => res.json(req.user))
   .put(protect, updateUserProfile);
 
 router.route('/cart')
@@ -62,7 +57,7 @@ router.route('/cart')
 router.delete('/cart/:productId', protect, removeFromUserCart);
 router.get('/can-review/:productId', protect, checkUserCanReview);
 
-// ADMIN ONLY ROUTES for specific users by ID
+// ADMIN ONLY ROUTES
 router.route('/:id')
   .get(protect, admin, getUserById)
   .put(protect, admin, updateUser)

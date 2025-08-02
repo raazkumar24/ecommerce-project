@@ -39,21 +39,20 @@ import {
 } from '../controllers/productController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
-// PUBLIC & ADMIN ROUTES for the base '/' endpoint
+// PUBLIC & ADMIN ROUTES
 router.route('/')
   .get(getProducts)
   .post(protect, admin, createProduct);
 
-// ADMIN ONLY ROUTE for getting all products without pagination
 router.get('/admin', protect, admin, getAdminProducts);
 
-// ROUTES for a specific product ID
+// ROUTES FOR A SPECIFIC PRODUCT ID
 router.route('/:id')
   .get(getProductById)
   .put(protect, admin, updateProduct)
   .delete(protect, admin, deleteProduct);
 
-// ROUTES for product reviews
+// ROUTES FOR PRODUCT REVIEWS
 router.route('/:id/reviews')
   .post(protect, createProductReview)
   .put(protect, updateProductReview);

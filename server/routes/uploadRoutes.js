@@ -79,45 +79,20 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// This middleware function handles the entire upload process in the correct order.
-const uploadToCloudinary = (req, res, next) => {
-  // 1. Configure Cloudinary credentials.
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-  });
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'E-Shop',
+    allowed_formats: ['jpeg', 'png', 'jpg'],
+  },
+});
 
-  // 2. Create the CloudinaryStorage instance.
-  const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: 'E-Shop',
-      allowed_formats: ['jpeg', 'png', 'jpg', 'gif', 'webp'],
-    },
-  });
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 
-  // 3. Create the multer upload instance to handle multiple files.
-  const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB file size limit
-  }).array('images', 5);
-
-  // 4. Execute the multer upload middleware.
-  upload(req, res, (err) => {
-    if (err) {
-      console.error("Upload Error:", err);
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ message: 'File is too large. Maximum size is 5MB.' });
-      }
-      return res.status(500).json({ message: 'Image upload failed.', error: err.message });
-    }
-    next();
-  });
-};
-
-// --- API Endpoint Definition ---
-router.post('/', protect, admin, uploadToCloudinary, (req, res) => {
+router.post('/', protect, admin, upload.array('images', 5), (req, res) => {
   if (req.files && req.files.length > 0) {
     const imageUrls = req.files.map(file => file.path);
     res.status(200).send({

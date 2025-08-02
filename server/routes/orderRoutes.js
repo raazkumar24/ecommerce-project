@@ -31,12 +31,11 @@ import {
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
-// USER AND ADMIN ROUTES for the base '/' endpoint
+// USER AND ADMIN ROUTES
 router.route('/')
   .post(protect, addOrderItems)
   .get(protect, admin, getOrders);
 
-// PROTECTED USER ROUTES
 router.get('/myorders', protect, getMyOrders);
 
 // ROUTES FOR A SPECIFIC ORDER ID
