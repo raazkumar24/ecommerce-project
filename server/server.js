@@ -80,91 +80,70 @@
 
 
 
+// FILE: server/server.js (Final Corrected Version for Deployment)
+
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/db.js';
+
+// --- Route Imports ---
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 
-// Configure environment variables
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const envPath = path.resolve(__dirname, '.env');
-
-dotenv.config({ path: envPath });
-
-// Verify environment variables
-console.log('--- Verifying Environment Variables ---');
-console.log('Cloudinary Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
-console.log('Cloudinary API Key:', process.env.CLOUDINARY_API_KEY);
-console.log('Cloudinary API Secret:', process.env.CLOUDINARY_API_SECRET ? 'Loaded' : 'NOT LOADED');
-console.log('Mongo URI:', process.env.MONGO_URI ? 'Loaded' : 'NOT LOADED');
-console.log('Node Environment:', process.env.NODE_ENV || 'development');
-console.log('------------------------------------');
+// Load environment variables
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// Middleware
+// --- Middleware ---
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-// CORS configuration - adjust as needed
-app.use(cors({
-  origin: '*', // Allow all origins (adjust for production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// API Routes
+// --- API Routes ---
+// All requests to these URLs will be handled by your API.
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
-});
+// --- DEPLOYMENT CONFIGURATION ---
+// This is the crucial block for making your frontend work on the live server.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// API documentation endpoint
-app.get('/', (req, res) => {
-  res.json({
-    message: 'E-Commerce API',
-    endpoints: {
-      products: '/api/products',
-      users: '/api/users',
-      orders: '/api/orders',
-      uploads: '/api/upload'
-    },
-    status: 'running'
+// This check ensures this code only runs on the live Render server
+if (process.env.NODE_ENV === 'production') {
+  // 1. Statically serve the frontend's 'dist' folder.
+  // This tells Express to treat the `client/dist` folder as a static file server.
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
+  // 2. For any request that doesn't match an API route, serve the main index.html file.
+  // This is the catch-all that allows React Router to handle all the frontend navigation.
+  app.get('*', (req, res) =>
+    res.sendFile(path.resolve(__dirname, '../client', 'dist', 'index.html'))
+  );
+} else {
+  // If not in production, have a simple test route for the root URL.
+  app.get('/', (req, res) => {
+    res.send('API is running in development mode...');
   });
-});
+}
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
-
-// Server startup
+// --- Server Startup ---
 const startServer = async () => {
   try {
     await connectDB();
     app.listen(PORT, () => {
-      console.log(`✅ Server is running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-      console.log(`🔗 Access the API at http://localhost:${PORT}/api`);
+      console.log(`✅ Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error(`❌ Failed to start server:`, error);
     process.exit(1);
   }
 };
