@@ -100,7 +100,7 @@ const CategoryPage = ({ navigate, category, pageNumber = 1 }) => {
         transition={{ duration: 0.5 }}
         className="mb-6 sm:mb-8 text-center"
       >
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#D98A7E] mb-2 capitalize">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#D98A7E] mb-2 capitalize">
           {category}
         </h1>
         <p className="text-sm sm:text-base text-gray-500">Discover our premium {category} collection</p>

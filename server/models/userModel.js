@@ -1,59 +1,60 @@
-// FILE: server/models/userModel.js (Updated)
+// FILE: server/models/userModel.js (Final Corrected Version)
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// Define the schema for an item within the cart
-const cartItemSchema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'Product', // Creates a reference to the 'Product' model
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    isAdmin: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    cart: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+          ref: 'Product',
+        },
+        qty: { type: Number, required: true },
+      },
+    ],
   },
-  qty: {
-    type: Number,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  isAdmin: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  // Add the cart field, which is an array of cartItemSchema
-  cart: [cartItemSchema],
-}, {
-  timestamps: true,
-});
-
-// ... (keep the existing matchPassword and pre-save middleware functions)
-userSchema.methods.matchPassword = async function(enteredPassword) {
+// Method to compare entered password with the hashed password in the database
+userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre('save', async function(next) {
+// Middleware to run before saving a user document. This will hash the password.
+userSchema.pre('save', async function (next) {
+  // Only hash the password if it has been modified (or is new)
   if (!this.isModified('password')) {
     next();
   }
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-
 const User = mongoose.model('User', userSchema);
+
 export default User;

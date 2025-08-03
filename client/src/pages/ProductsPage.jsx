@@ -496,7 +496,7 @@ const ProductsPage = ({ navigate, keyword = "", pageNumber = 1 }) => {
         transition={{ duration: 0.5 }}
         className="mb-8 text-center"
       >
-        <h1 className="text-3xl md:text-5xl font-serif font-bold text-[#D98A7E] mb-2">
+        <h1 className="text-3xl md:text-5xl font-bold text-[#D98A7E] mb-2">
           {keyword ? `Results for "${keyword}"` : "Our Collection"}
         </h1>
         <p className="text-gray-500 text-sm md:text-base">Discover our premium selection</p>

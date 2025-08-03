@@ -428,6 +428,13 @@ const HomePage = ({ navigate }) => {
     }
   };
 
+  // Navigate to product detail page
+const goToDetail = (products) => {
+  if (!products?._id) return;
+  navigate(`/products/${products._id}`);
+};
+
+
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF5F0] to-[#FADCD9]/30">
@@ -464,7 +471,7 @@ const HomePage = ({ navigate }) => {
 
             <motion.h1
               variants={itemVariants}
-              className="mt-6 text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-[#5C3A2E] leading-tight"
+              className="mt-6 text-4xl sm:text-5xl md:text-6xl font-bold text-[#5C3A2E] leading-tight"
             >
               Elevate Your <span className="text-[#D98A7E]">Everyday</span> Essentials
             </motion.h1>
@@ -527,6 +534,7 @@ const HomePage = ({ navigate }) => {
                 >
                   Add to Cart - ${(currentProduct.price * quantity).toFixed(2)}
                 </button>
+            
               </motion.div>
             ) : null}
           </motion.div>
@@ -565,6 +573,22 @@ const HomePage = ({ navigate }) => {
                   loading="lazy"
                   whileHover={{ scale: 1.05 }}
                 />
+
+                {/* Floating View Details Button */}
+       <button
+      onClick={() => goToDetail(currentProduct)}
+      className="absolute top-8 right-8 z-30 bg-gradient-to-r from-[#D98A7E] via-[#FADCD9] to-[#D4A28E] text-white font-bold py-2 px-7 rounded-full shadow-2xl hover:scale-105 hover:bg-[#D98A7E] transition-all duration-300 flex items-center gap-2 border-2 border-white/80"
+      style={{
+        letterSpacing: "0.07em",
+        fontSize: "1.15rem",
+        boxShadow: "0 8px 32px 0 rgba(217, 138, 126, 0.25)",
+      }}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      View Details
+    </button>
               </motion.div>
             )}
 
@@ -581,7 +605,7 @@ const HomePage = ({ navigate }) => {
                     <button
                       key={index}
                       onClick={() => handleProductChange(index)}
-                      className={`w-12 h-12 rounded-lg border-2 overflow-hidden transition-all ${
+                      className={`w-12 h-12 rounded-full p-1 border-2 overflow-hidden transition-all ${
                         currentProductIndex === index
                           ? "border-white scale-110 shadow-md"
                           : "border-transparent"
@@ -592,7 +616,7 @@ const HomePage = ({ navigate }) => {
                         <img
                           src={product.images[0]}
                           alt=""
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                           loading="lazy"
                         />
                       )}

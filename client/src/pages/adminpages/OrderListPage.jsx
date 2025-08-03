@@ -66,7 +66,7 @@ const OrderListPage = ({ navigate }) => {
       >
         {/* Header Section */}
         <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-4xl font-serif font-bold text-[#D98A7E]">Order Management</h1>
+          <h1 className="text-4xl font-bold text-[#D98A7E]">Order Management</h1>
           <p className="text-gray-500 mt-1">View and manage all customer orders.</p>
         </motion.div>
 

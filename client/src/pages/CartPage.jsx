@@ -56,7 +56,7 @@ const CartPage = ({ navigate }) => {
 
       {/* Page Header */}
       <motion.div variants={itemVariants} className="text-center mb-6 sm:mb-10">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#D98A7E] mb-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#D98A7E] mb-2">
           Your Shopping Cart
         </h1>
         <p className="text-gray-500 text-sm sm:text-base">
@@ -108,7 +108,8 @@ const CartPage = ({ navigate }) => {
                     <img 
                       src={(item.images && item.images[0]) || item.image || `https://placehold.co/100x100/e2e8f0/333?text=Invalid`} 
                       alt={item.name || 'Invalid Product'}
-                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-lg mr-3 sm:mr-4 bg-gray-50"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-lg mr-3 sm:mr-4 bg-gray-50 cursor-pointer transition-transform hover:scale-105"
+                      onClick={() => item._id && navigate(`/products/${item._id}`)}
                     />
                     <div className="flex-1 min-w-0">
                       <h2 className="font-semibold text-base sm:text-lg text-gray-800 truncate">
@@ -162,7 +163,7 @@ const CartPage = ({ navigate }) => {
             className="lg:col-span-1"
           >
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm sticky top-4 sm:top-6 lg:top-24">
-              <h2 className="text-xl sm:text-2xl font-serif font-bold mb-3 sm:mb-4 text-center text-[#D98A7E]">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-[#D98A7E]">
                 Order Summary
               </h2>
               <div className="space-y-2 text-gray-600 text-sm sm:text-base">

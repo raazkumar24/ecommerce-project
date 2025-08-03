@@ -71,7 +71,7 @@ const RegisterPage = ({ navigate }) => {
         
         {/* Right Column: Register Form */}
         <div className="flex-1 flex flex-col justify-center p-10">
-          <motion.h2 variants={itemVariants} className="text-3xl font-serif font-bold text-[#D98A7E] mb-6 text-center">Sign Up</motion.h2>
+          <motion.h2 variants={itemVariants} className="text-3xl font-bold text-[#D98A7E] mb-6 text-center">Sign Up</motion.h2>
           {error && (
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 text-center text-red-600 bg-red-100 px-3 py-2 rounded text-sm shadow">
               {error}

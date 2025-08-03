@@ -746,7 +746,7 @@ const ProductListPage = ({ navigate }) => {
         {/* Header Section */}
         <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-serif font-bold text-[#D98A7E]">Product Management</h1>
+            <h1 className="text-4xl font-bold text-[#D98A7E]">Product Management</h1>
             <p className="text-gray-500 mt-1">Manage your store's inventory</p>
           </div>
           <motion.button 

@@ -149,7 +149,7 @@ export default function App() {
   const useContainer = path !== '/';
 
   return (
-    <div className="bg-gradient-to-b from-[#FFF5F0] to-[#FADCD9]/30 min-h-screen flex flex-col font-sans">
+    <div className="bg-gradient-to-b from-[#FFF5F0] to-[#FADCD9]/30 min-h-screen flex flex-col font-Roboto">
       <Notification />
       <Header navigate={navigate} />
       

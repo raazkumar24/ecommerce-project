@@ -1,41 +1,29 @@
-// FILE: client/src/pages/PaymentPage.jsx (Completely Redesigned)
+// FILE: client/src/pages/PaymentPage.jsx (Responsive Redesign)
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import CheckoutSteps from '../components/common/CheckoutSteps';
-import { FaPaypal, FaCreditCard } from 'react-icons/fa'; // Icons for payment methods
+import { FaPaypal, FaCreditCard } from 'react-icons/fa';
 
 const PaymentPage = ({ navigate }) => {
-  // --- CONTEXT & STATE ---
-  // Get necessary data and functions from the CartContext
   const { cartItems, shippingAddress, paymentMethod, savePaymentMethod } = useCart();
 
-  // If the user hasn't entered a shipping address, redirect them back to that step.
   useEffect(() => {
     if (!shippingAddress.address) {
       navigate('/shipping');
     }
   }, [shippingAddress, navigate]);
 
-  // Initialize state with the saved payment method or default to 'PayPal'
   const [selectedMethod, setSelectedMethod] = useState(paymentMethod || 'PayPal');
-
-  // --- CALCULATIONS ---
-  // The subtotal is calculated here to be displayed in the live order summary.
   const subtotal = cartItems.reduce((acc, item) => acc + item.qty * (item.price || 0), 0);
 
-  // --- HANDLERS ---
-  // This function runs when the user submits the form.
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Save the chosen payment method to context and localStorage
     savePaymentMethod(selectedMethod);
-    // Navigate to the final step in the checkout process
     navigate('/placeorder');
   };
 
-  // --- ANIMATION VARIANTS ---
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
@@ -51,23 +39,28 @@ const PaymentPage = ({ navigate }) => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="max-w-7xl mx-auto"
+      className=" px-4 sm:px-6 lg:px-8"
     >
-      {/* Checkout progress bar, now highlighting step 3 */}
-      <CheckoutSteps step1 step2 step3 navigate={navigate} />
+      {/* Checkout progress bar with responsive padding */}
+      <div className="px-4 sm:px-0">
+        <CheckoutSteps step1 step2 step3 navigate={navigate} />
+      </div>
       
-      <div className="w-full grid lg:grid-cols-3 gap-8 mt-8">
-        {/* Left Column: Payment Method Selection */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 bg-white p-8 rounded-xl shadow-sm">
-          <h1 className="text-3xl font-serif font-bold text-[#D98A7E] mb-6">Payment Method</h1>
-          <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="w-full grid lg:grid-cols-3 gap-6 md:gap-8 mt-6 md:mt-8">
+        {/* Left Column: Payment Method Selection - full width on mobile */}
+        <motion.div 
+          variants={itemVariants} 
+          className="lg:col-span-2 bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-sm"
+        >
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#D98A7E] mb-4 sm:mb-6">Payment Method</h1>
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <fieldset>
-              <legend className="text-lg font-semibold text-gray-800 mb-4">Select a Method</legend>
-              <div className="space-y-4">
+              <legend className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Select a Method</legend>
+              <div className="space-y-3 sm:space-y-4">
                 {/* PayPal Option Card */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all duration-300 ${
+                  className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-300 ${
                     selectedMethod === 'PayPal' 
                       ? 'border-[#D4A28E] ring-2 ring-[#D4A28E] bg-[#FFF5F0]/50' 
                       : 'border-gray-300 bg-white'
@@ -84,17 +77,17 @@ const PaymentPage = ({ navigate }) => {
                       onChange={(e) => setSelectedMethod(e.target.value)}
                       className="w-4 h-4 text-[#D4A28E] border-gray-300 focus:ring-[#D98A7E]"
                     />
-                    <label htmlFor="paypal" className="ml-3 flex items-center text-sm font-medium text-gray-700">
-                      <FaPaypal className="text-2xl text-blue-800 mr-2" />
+                    <label htmlFor="paypal" className="ml-3 flex items-center text-sm sm:text-base font-medium text-gray-700">
+                      <FaPaypal className="text-xl sm:text-2xl text-blue-800 mr-2" />
                       PayPal or Credit Card
                     </label>
                   </div>
                 </motion.div>
 
-                {/* Placeholder for another payment method like Stripe */}
+                {/* Stripe Option Card */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all duration-300 ${
+                  className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-300 ${
                     selectedMethod === 'Stripe' 
                       ? 'border-[#D4A28E] ring-2 ring-[#D4A28E] bg-[#FFF5F0]/50' 
                       : 'border-gray-300 bg-white'
@@ -111,8 +104,8 @@ const PaymentPage = ({ navigate }) => {
                       onChange={(e) => setSelectedMethod(e.target.value)}
                       className="w-4 h-4 text-[#D4A28E] border-gray-300 focus:ring-[#D98A7E]"
                     />
-                    <label htmlFor="stripe" className="ml-3 flex items-center text-sm font-medium text-gray-700">
-                      <FaCreditCard className="text-2xl text-purple-700 mr-2" />
+                    <label htmlFor="stripe" className="ml-3 flex items-center text-sm sm:text-base font-medium text-gray-700">
+                      <FaCreditCard className="text-xl sm:text-2xl text-purple-700 mr-2" />
                       Stripe (Credit Card)
                     </label>
                   </div>
@@ -122,7 +115,7 @@ const PaymentPage = ({ navigate }) => {
 
             <motion.button 
               type="submit" 
-              className="w-full py-3 mt-4 bg-[#D4A28E] text-white font-semibold rounded-lg hover:bg-[#C8907A] transition-colors shadow-md"
+              className="w-full py-2 sm:py-3 mt-3 sm:mt-4 bg-[#D4A28E] text-white font-semibold rounded-lg hover:bg-[#C8907A] transition-colors shadow-md"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -131,11 +124,14 @@ const PaymentPage = ({ navigate }) => {
           </form>
         </motion.div>
 
-        {/* Right Column: Order Summary */}
-        <motion.div variants={itemVariants} className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-xl shadow-sm sticky top-24">
-            <h2 className="text-2xl font-serif font-bold mb-4 text-center text-[#D98A7E]">Order Summary</h2>
-            <div className="space-y-2 text-gray-600">
+        {/* Right Column: Order Summary - full width on mobile, appears above form */}
+        <motion.div 
+          variants={itemVariants} 
+          className="lg:col-span-1 order-first lg:order-last"
+        >
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm lg:sticky lg:top-24">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-center text-[#D98A7E]">Order Summary</h2>
+            <div className="space-y-2 text-sm sm:text-base text-gray-600">
               <div className="flex justify-between">
                 <span>{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</span>
                 <span className="font-medium text-gray-800">${subtotal.toFixed(2)}</span>
@@ -144,7 +140,7 @@ const PaymentPage = ({ navigate }) => {
                 <span>Shipping</span>
                 <span className="text-green-600">FREE</span>
               </div>
-              <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2 text-gray-900">
+              <div className="flex justify-between font-bold text-base sm:text-lg border-t pt-2 mt-2 text-gray-900">
                 <span>Total</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>

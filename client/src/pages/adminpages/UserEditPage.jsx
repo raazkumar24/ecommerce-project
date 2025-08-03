@@ -95,7 +95,7 @@ const UserEditPage = ({ id, navigate }) => {
           </button>
           
           {/* Page Header */}
-          <h1 className="text-4xl font-serif font-bold text-[#D98A7E]">Edit User</h1>
+          <h1 className="text-4xl font-bold text-[#D98A7E]">Edit User</h1>
           <p className="text-gray-500 mt-1 mb-8">Update the user's details and permissions.</p>
         </motion.div>
         

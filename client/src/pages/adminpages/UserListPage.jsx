@@ -105,7 +105,7 @@ const UserListPage = ({ navigate }) => {
       >
         {/* Header Section */}
         <motion.div variants={itemVariants} className="mb-8">
-          <h1 className="text-4xl font-serif font-bold text-[#D98A7E]">User Management</h1>
+          <h1 className="text-4xl font-bold text-[#D98A7E]">User Management</h1>
           <p className="text-gray-500 mt-1">View, edit, and manage all registered users.</p>
         </motion.div>
 

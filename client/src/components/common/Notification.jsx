@@ -17,10 +17,10 @@ import { FiX, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
  * - Accessible with ARIA roles for screen readers.
  */
 const Notification = () => {
-  // Extract notification data and the clearing function from the context
-  const { notification, clearNotification } = useNotification();
+ // Extract notification data and the clearing function from the context
+ const { notification, clearNotification } = useNotification();
 
-  // This effect sets up a timer to automatically dismiss the notification after 4 seconds.
+ // This effect sets up a timer to automatically dismiss the notification after 4 seconds.
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -61,7 +61,7 @@ const Notification = () => {
           // --- THIS IS THE RESPONSIVE FIX ---
           // On mobile (default), it's a banner fixed to the top.
           // On small screens and up (`sm:`), it moves to the top-right corner.
-          className={`fixed top-5 left-5 right-5 sm:left-auto sm:top-24 sm:right-5 w-auto sm:w-full max-w-none sm:max-w-sm rounded-xl shadow-lg flex items-start space-x-3 p-4 border z-[9999] ${typeClasses}`}
+          className={`fixed top-10 left-5 right-5 sm:left-auto sm:top-24 sm:right-5 w-auto sm:w-full max-w-none sm:max-w-sm rounded-xl shadow-lg flex items-start space-x-3 p-4 border z-[9999] ${typeClasses}`}
         >
           {/* Icon container */}
           <div className={`flex-shrink-0 text-xl ${isSuccess ? 'text-emerald-600' : 'text-[#D98A7E]'}`}>
