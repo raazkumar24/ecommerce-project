@@ -154,7 +154,7 @@ const ProductEditPage = ({ id, navigate }) => {
   if (error) return <p className="text-center py-12 text-red-600">{error}</p>;
 
   return (
-    <div className="bg-[#F8F5F2] min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-4xl font-serif font-bold text-[#D98A7E] mb-2">Edit Product</h1>

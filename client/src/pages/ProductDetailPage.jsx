@@ -462,7 +462,7 @@ const ProductDetailPage = ({ id, navigate }) => {
   // --- RENDER LOGIC ---
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="px-4 py-8">
         <div className="mb-8 h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
         <div className="grid md:grid-cols-2 gap-12 mb-16">
           <div className="bg-gray-200 w-full h-[500px] rounded-2xl animate-pulse"></div>

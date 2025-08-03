@@ -736,7 +736,7 @@ const ProductListPage = ({ navigate }) => {
   };
 
   return (
-    <div className="bg-[#F8F5F2] min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       <motion.div 
         initial="hidden"
         animate="visible"
