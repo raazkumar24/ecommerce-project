@@ -60,7 +60,7 @@ export const CartProvider = ({ children }) => {
     }
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/users/cart", {
+      const response = await fetch("/api/users/cart", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo.token}`,
@@ -95,7 +95,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:5000/api/users/cart", {
+      const response = await fetch("/api/users/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ export const CartProvider = ({ children }) => {
     const newQty = item.qty - 1;
 
     try {
-      const response = await fetch("http://localhost:5000/api/users/cart", {
+      const response = await fetch("/api/users/cart", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +151,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/users/cart/${productId}`,
+        `/api/users/cart/${productId}`,
         {
           method: "DELETE",
           headers: {
