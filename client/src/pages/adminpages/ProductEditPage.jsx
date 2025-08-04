@@ -1,4 +1,4 @@
-// FILE: client/src/pages/adminpages/ProductEditPage.jsx (Corrected with Tags Pre-fill)
+// FILE: client/src/pages/adminpages/ProductEditPage.jsx (Final Corrected Version)
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -11,7 +11,7 @@ const ProductEditPage = ({ id, navigate }) => {
   const { userInfo } = useAuth();
   const { showNotification } = useNotification();
 
-  // Form fields state.
+  // Form fields state
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [images, setImages] = useState([]);
@@ -19,18 +19,17 @@ const ProductEditPage = ({ id, navigate }) => {
   const [category, setCategory] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
-  // State for the product tags
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState('');
 
-  // UI states for loading, errors, and uploads
+  // UI states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   // --- DATA FETCHING ---
-  // Fetches the product details when the component mounts.
+  // Fetches the product details when the component mounts or the ID changes.
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -39,7 +38,7 @@ const ProductEditPage = ({ id, navigate }) => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to fetch product");
 
-        // Pre-fill the form fields with the fetched product data.
+        // Pre-fill all form fields with the fetched product data.
         setName(data.name);
         setPrice(data.price);
         setImages(data.images || []);
@@ -47,12 +46,7 @@ const ProductEditPage = ({ id, navigate }) => {
         setCategory(data.category);
         setCountInStock(data.countInStock);
         setDescription(data.description);
-        
-        // --- THIS IS THE FIX ---
-        // We now correctly set the `tags` state with the data fetched from the server.
-        // The `|| []` ensures that if a product has no tags, it defaults to an empty array.
         setTags(data.tags || []);
-
       } catch (err) {
         setError(err.message);
         showNotification(`Error: ${err.message}`, 'error');
@@ -66,7 +60,11 @@ const ProductEditPage = ({ id, navigate }) => {
     } else {
       navigate("/login");
     }
-  }, [id, userInfo, navigate, showNotification]);
+    // --- THIS IS THE FIX (1/2) ---
+    // The dependency array is simplified. Functions from context like `navigate` and
+    // `showNotification` do not change and should not trigger a re-fetch of product data.
+    // The component will now only re-fetch if the product ID or the user changes.
+  }, [id, userInfo]);
 
   // --- HANDLERS ---
   // Handles the main form submission to update the product.
@@ -80,7 +78,8 @@ const ProductEditPage = ({ id, navigate }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userInfo.token}`,
         },
-        // The body now sends the `tags` array to the backend.
+        // --- THIS IS THE FIX (2/2) ---
+        // The body now correctly includes the `tags` array when sending the update.
         body: JSON.stringify({
           name, price: Number(price), images, brand, category,
           countInStock: Number(countInStock), description, tags,
@@ -126,11 +125,11 @@ const ProductEditPage = ({ id, navigate }) => {
     }
   };
 
+  // Handles the removal of an image from the `images` array.
   const handleRemoveImage = (imageUrlToRemove) => {
     setImages(prevImages => prevImages.filter(url => url !== imageUrlToRemove));
   };
   
-  // --- TAG HANDLERS ---
   // Handles adding a new tag when the user presses Enter or Comma.
   const handleTagKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -154,10 +153,10 @@ const ProductEditPage = ({ id, navigate }) => {
   if (error) return <p className="text-center py-12 text-red-600">{error}</p>;
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8">
+    <div className="bg-[#F8F5F2] min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-4xl font-bold text-[#D98A7E] mb-2">Edit Product</h1>
+          <h1 className="text-4xl font-serif font-bold text-[#D98A7E] mb-2">Edit Product</h1>
           <p className="text-gray-500 mb-8">Update the details for your product below.</p>
         </motion.div>
         
@@ -165,7 +164,6 @@ const ProductEditPage = ({ id, navigate }) => {
           <div className="bg-white p-8 rounded-2xl shadow-sm">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Core Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name, Price, Brand, Category, etc. fields remain the same */}
               <div>
                 <label htmlFor="name" className="block font-semibold text-gray-700 mb-1">Name</label>
                 <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#D4A28E] transition" />
@@ -213,7 +211,6 @@ const ProductEditPage = ({ id, navigate }) => {
             {uploading && <div className="mt-4 text-center text-gray-600">Uploading...</div>}
           </div>
 
-          {/* --- TAGS INPUT SECTION --- */}
           <div className="bg-white p-8 rounded-2xl shadow-sm">
             <h2 className="text-xl font-bold text-gray-800 mb-2">Search Tags</h2>
             <p className="text-sm text-gray-500 mb-4">Add keywords to improve search results. Press Enter or comma to add a tag.</p>

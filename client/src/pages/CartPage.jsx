@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
 import { FiPlus, FiMinus, FiTrash2, FiArrowLeft } from 'react-icons/fi';
 
-const CartPage = ({ navigate }) => {
+const CartPage = () => {
   // --- CONTEXT & STATE ---
   const { cartItems, addToCart, decreaseQuantity, removeFromCart } = useCart();
   const { showNotification } = useNotification();
@@ -24,8 +24,28 @@ const CartPage = ({ navigate }) => {
       showNotification('Your cart contains an invalid item. Please remove it to proceed.', 'error');
       return;
     }
-    navigate('/shipping');
-  }
+    // Replace with your actual checkout logic
+    console.log('Proceeding to checkout');
+    window.alert('Proceeding to checkout (replace with your logic)');
+  };
+
+  const handleBack = () => {
+    // Replace with your back navigation logic
+    console.log('Going back');
+    window.history.back(); // Simple fallback
+  };
+
+  const handleContinueShopping = () => {
+    // Replace with your products page navigation
+    console.log('Continuing shopping');
+    window.alert('Redirect to products page (replace with your logic)');
+  };
+
+  const handleViewProduct = (productId) => {
+    // Replace with your product page navigation
+    console.log('Viewing product:', productId);
+    window.alert(`View product ${productId} (replace with your logic)`);
+  };
 
   // --- ANIMATION VARIANTS ---
   const containerVariants = {
@@ -44,12 +64,12 @@ const CartPage = ({ navigate }) => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
+      className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto"
     >
-      {/* Mobile Back Button */}
+      {/* Back Button */}
       <button 
-        onClick={() => navigate(-1)} 
-        className="lg:hidden flex items-center text-[#D98A7E] mb-4"
+        onClick={handleBack}
+        className="flex items-center text-[#D98A7E] mb-4 hover:text-[#C8907A] transition-colors"
       >
         <FiArrowLeft className="mr-2" /> Back
       </button>
@@ -76,7 +96,7 @@ const CartPage = ({ navigate }) => {
             Your cart is currently empty.
           </p>
           <motion.button 
-            onClick={() => navigate('/products')}
+            onClick={handleContinueShopping}
             className="bg-[#D4A28E] text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-lg sm:rounded-xl hover:bg-[#C8907A] transition-colors shadow-md text-sm sm:text-base"
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
@@ -109,7 +129,7 @@ const CartPage = ({ navigate }) => {
                       src={(item.images && item.images[0]) || item.image || `https://placehold.co/100x100/e2e8f0/333?text=Invalid`} 
                       alt={item.name || 'Invalid Product'}
                       className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-lg mr-3 sm:mr-4 bg-gray-50 cursor-pointer transition-transform hover:scale-105"
-                      onClick={() => item._id && navigate(`/products/${item._id}`)}
+                      onClick={() => item._id && handleViewProduct(item._id)}
                     />
                     <div className="flex-1 min-w-0">
                       <h2 className="font-semibold text-base sm:text-lg text-gray-800 truncate">
@@ -147,7 +167,7 @@ const CartPage = ({ navigate }) => {
                     {/* Remove Button */}
                     <button 
                       onClick={() => removeFromCart(item._id)} 
-                      className="text-red-500 hover:text-red-700 ml-2 sm:ml-0"
+                      className="text-red-500 hover:text-red-700 ml-2 sm:ml-0 transition-colors"
                     >
                       <FiTrash2 className="h-4 w-4 sm:h-5 sm:w-5" />
                     </button>
@@ -192,10 +212,10 @@ const CartPage = ({ navigate }) => {
                 Proceed to Checkout
               </motion.button>
               
-              {/* Continue Shopping Button (Mobile) */}
+              {/* Continue Shopping Button */}
               <button
-                onClick={() => navigate('/products')}
-                className="w-full mt-3 py-2 border border-[#D4A28E] text-[#D4A28E] font-medium rounded-lg hover:bg-[#FFF5F0] transition-colors text-sm sm:text-base lg:hidden"
+                onClick={handleContinueShopping}
+                className="w-full mt-3 py-2 border border-[#D4A28E] text-[#D4A28E] font-medium rounded-lg hover:bg-[#FFF5F0] transition-colors text-sm sm:text-base"
               >
                 Continue Shopping
               </button>
