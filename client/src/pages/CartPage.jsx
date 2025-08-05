@@ -121,7 +121,7 @@ const CartPage = ({ onBack, navigate }) => {
                       onClick={() => item._id && navigate(`/products/${item._id}`)}
                     />
                     <div className="flex-1 min-w-0">
-                      <h2 className="font-semibold text-base sm:text-lg text-gray-800 truncate">
+                      <h2 className="font-semibold text-base sm:text-lg text-gray-800 line-clamp-2">
                         {item.name || 'Product No Longer Available'}
                       </h2>
                       <p className="text-gray-600 text-sm sm:text-base">
