@@ -135,5 +135,3 @@ This project is **open-source** and available for everyone.
 - You're using **Cloudinary** for image storage.
 - It gives instructions for setting up `.env` variables.
 
-Would you like me to make this README even more **GitHub-pro level** by adding cool **badges** (like React version, Vite, MongoDB, License, etc.) at the top? (It makes the project look more professional.)
-```
